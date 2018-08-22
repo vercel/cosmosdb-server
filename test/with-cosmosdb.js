@@ -3,10 +3,7 @@
 
 const cosmosDBServerMock = require("../src");
 
-module.exports = function withCosmosDBServer(
-  mock: (string, any) => void,
-  fn: () => any
-) {
+module.exports = function withCosmosDBServer(fn: () => any) {
   return async (...args: any[]) => {
     const server = cosmosDBServerMock();
     await new Promise(resolve => {
@@ -14,12 +11,11 @@ module.exports = function withCosmosDBServer(
     });
     const { port } = server.address();
 
-    mock("@zeit/cosmosdb/lib/pick-region", () => `https://localhost:${port}`);
-
     const client = require("@zeit/cosmosdb")({
       accountId: "test-acccount",
       databaseName: "test-database",
       disableLogging: true,
+      endpoint: `https://localhost:${port}`,
       masterKey: "test-masterkey"
     });
 

@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@zeit/best": "0.4.3",
-    "@zeit/cosmosdb": "8.2.2",
+    "@zeit/cosmosdb": "8.3.0",
     "@zeit/git-hooks": "0.1.4",
     "babel-eslint": "8.2.6",
     "eslint": "5.3.0",

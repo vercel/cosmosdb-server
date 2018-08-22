@@ -3,13 +3,11 @@
 
 const assert = require("assert");
 const withCosmosDB = require("./with-cosmosdb");
-const withMock = require("./with-mock");
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 function withTestEnv(fn: Object => any) {
-  // $FlowFixMe
-  return withMock(mock => withCosmosDB(mock, fn)());
+  return withCosmosDB(fn);
 }
 
 exports.readDocument404 = withTestEnv(
