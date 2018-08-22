@@ -20,7 +20,8 @@
     "lint": "eslint --ignore-path .gitignore .",
     "lint-staged": "git diff --cached --name-only '*.js' | xargs eslint",
     "prepublish": "yarn run build",
-    "test": "best -I test/index.js -r flow-remove-types/register"
+    "test": "best -I test/index.js -r flow-remove-types/register",
+    "test-sdk": "./test/sdk.sh"
   },
   "dependencies": {
     "path-to-regexp": "2.2.1",
