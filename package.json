@@ -5,13 +5,17 @@
   "license": "UNLICENSED",
   "main": "lib/index.js",
   "files": [
+    "bin",
     "cert.pem",
     "key.pem",
     "lib"
   ],
+  "bin": {
+    "cosmosdb-server": "bin/cosmosdb-server.js"
+  },
   "scripts": {
     "build": "flow-remove-types src/ -d lib/",
-    "format": "prettier --write '{src,test}/**/*.js'",
+    "format": "prettier --write '{bin,src,test}/**/*.js'",
     "format-staged": "git diff --cached --name-only '*.js' | xargs prettier --list-different",
     "lint": "eslint --ignore-path .gitignore .",
     "lint-staged": "git diff --cached --name-only '*.js' | xargs eslint",
@@ -35,7 +39,6 @@
     "eslint-plugin-import": "2.14.0",
     "eslint-plugin-jsx-a11y": "6.1.1",
     "eslint-plugin-react": "7.11.0",
-    "flow-bin": "0.79.1",
     "flow-remove-types": "1.2.3",
     "prettier": "1.14.2"
   },
