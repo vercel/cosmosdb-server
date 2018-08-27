@@ -13,8 +13,12 @@ module.exports = (rules: Object) => {
 
   return (req: http$IncomingMessage) => {
     const { pathname } = parse(req.url);
+    const isQuery =
+      req.headers["x-ms-documentdb-isquery"] === "true" ||
+      req.headers["content-type"] === "application/query+json";
 
-    const methodRoutes = routes[req.method] || [];
+    const methodRoutes =
+      routes[`${req.method}${isQuery ? "_QUERY" : ""}`] || [];
     for (let i = 0, l = methodRoutes.length; i < l; i += 1) {
       const [match, handler] = methodRoutes[i];
       const params = match(pathname);

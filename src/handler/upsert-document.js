@@ -1,25 +1,24 @@
 // @flow
-const getRawBody = require("raw-body");
 const uuid = require("uuid/v1");
+const json = require("../json");
 
 module.exports = async (
-  dbs: Map<string, Map<string, Object>>,
+  dbs: Map<string, Map<string, any>>,
   req: http$IncomingMessage,
   res: http$ServerResponse,
-  { dbName, collName }: { dbName: string, collName: string }
+  { dbId, collId }: { dbId: string, collId: string }
 ) => {
-  const rawBody = await getRawBody(req);
-  const body = JSON.parse(rawBody);
+  const body = await json(req);
   if (!body.id) {
     throw new Error("Missing id");
   }
 
   const doc = { ...body, _etag: uuid() };
-  const db = dbs.get(dbName) || new Map();
-  const coll = db.get(collName) || new Map();
+  const db = dbs.get(dbId) || new Map();
+  const coll = db.get(collId) || new Map();
   coll.set(body.id, doc);
-  db.set(collName, coll);
-  dbs.set(dbName, db);
+  db.set(collId, coll);
+  dbs.set(dbId, db);
 
   return doc;
 };

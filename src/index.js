@@ -26,7 +26,7 @@ module.exports = () => {
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error(err);
-          res.statusCode = 404;
+          res.statusCode = 500;
         }
       } else {
         res.statusCode = 400;
@@ -37,6 +37,10 @@ module.exports = () => {
       }
 
       res.setHeader("content-type", "application/json");
+      res.setHeader(
+        "content-location",
+        `https://${req.headers.host}/${req.url}`
+      );
       res.end(JSON.stringify(body || {}));
     })().catch(err => {
       // eslint-disable-next-line no-console

@@ -3,7 +3,7 @@
 
 const cosmosDBServerMock = require("../src");
 
-module.exports = function withCosmosDBServer(fn: () => any) {
+module.exports = function withCosmosDBServer(fn: (...any) => any) {
   return async (...args: any[]) => {
     const server = cosmosDBServerMock();
     await new Promise(resolve => {

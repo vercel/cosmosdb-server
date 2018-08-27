@@ -1,5 +1,4 @@
 // @flow
-/* eslint-disable no-underscore-dangle */
 
 const assert = require("assert");
 const withCosmosDB = require("./with-cosmosdb");
