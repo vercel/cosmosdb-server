@@ -9,4 +9,4 @@ pid=$!
 cd test/azure-cosmosdb-node/source
 yarn
 cd test
-ACCOUNT_HOST="https://localhost:$port" ../node_modules/.bin/mocha -t 0 -R spec
+ACCOUNT_HOST="https://localhost:$port" ../node_modules/.bin/mocha -t 0 -R spec -b

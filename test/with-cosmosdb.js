@@ -1,6 +1,7 @@
 // @flow
 /* eslint-disable global-require */
 
+const { CosmosClient } = require("@azure/cosmos");
 const cosmosDBServerMock = require("../src");
 
 module.exports = function withCosmosDBServer(fn: (...any) => any) {
@@ -11,12 +12,11 @@ module.exports = function withCosmosDBServer(fn: (...any) => any) {
     });
     const { port } = server.address();
 
-    const client = require("@zeit/cosmosdb")({
-      accountId: "test-acccount",
-      databaseName: "test-database",
-      disableLogging: true,
+    const client = new CosmosClient({
       endpoint: `https://localhost:${port}`,
-      masterKey: "test-masterkey"
+      auth: {
+        masterKey: "test-master-key"
+      }
     });
 
     try {

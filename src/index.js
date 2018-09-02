@@ -2,6 +2,7 @@
 const { readFileSync } = require("fs");
 const { createServer } = require("https");
 const { join } = require("path");
+const Account = require("./account");
 const routes = require("./routes");
 
 const options = {
@@ -12,7 +13,7 @@ const options = {
 };
 
 module.exports = () => {
-  const dbs = new Map();
+  const account = new Account();
 
   return createServer(options, (req, res) => {
     const route = routes(req);
@@ -22,7 +23,7 @@ module.exports = () => {
       if (route) {
         const [params, handler] = route;
         try {
-          body = await handler(dbs, req, res, params);
+          body = await handler(account, req, res, params);
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error(err);
@@ -32,19 +33,20 @@ module.exports = () => {
         res.statusCode = 400;
       }
 
-      if (!body && res.statusCode === 200) {
-        res.statusCode = 404;
-      }
-
       res.setHeader("content-type", "application/json");
       res.setHeader(
         "content-location",
         `https://${req.headers.host}/${req.url}`
       );
-      res.end(JSON.stringify(body || {}));
+      res.setHeader("connection", "close");
+      res.end(JSON.stringify(body));
     })().catch(err => {
       // eslint-disable-next-line no-console
       console.error(err);
+      if (!res.finished) {
+        res.statusCode = 500;
+        res.end("");
+      }
     });
   });
 };

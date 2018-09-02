@@ -7,10 +7,8 @@ module.exports = (
   res: http$ServerResponse,
   { dbId }: { dbId: string }
 ) => {
-  if (!account.database(dbId).read()) {
-    res.statusCode = 404;
-    return {};
-  }
+  const DocumentCollections = account.database(dbId).collections.read();
+  if (!DocumentCollections) return null;
 
-  return account.databases.delete(dbId);
+  return { DocumentCollections, _count: DocumentCollections.length };
 };

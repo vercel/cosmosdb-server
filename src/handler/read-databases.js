@@ -1,10 +1,7 @@
 // @flow
-const { INTERNAL_DB, DATABASES_COLL } = require("../constants");
+import type Account from "../account";
 
-module.exports = (dbs: Map<string, Map<string, Object>>) => {
-  const db = dbs.get(INTERNAL_DB) || new Map();
-  const coll = db.get(DATABASES_COLL) || new Map();
-  return {
-    Databases: [...coll.values()]
-  };
+module.exports = (account: Account) => {
+  const Databases = account.databases.read();
+  return { Databases, _count: Databases.length };
 };

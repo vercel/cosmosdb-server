@@ -7,7 +7,7 @@ module.exports = async (
   account: Account,
   req: http$IncomingMessage,
   res: http$ServerResponse,
-  { dbId, collId }: { dbId: string, collId: string }
+  { dbId, collId, docId }: { dbId: string, collId: string, docId: string }
 ) => {
   const body = await json(req);
   if (!body.id) {
@@ -16,10 +16,16 @@ module.exports = async (
   }
 
   const collection = account.database(dbId).collection(collId);
-  if (!collection.read()) {
+  const data = collection.document(docId).read();
+  if (!data) {
     res.statusCode = 404;
     return {};
   }
 
-  return collection.documents.upsert(body);
+  if (data.id !== body.id) {
+    res.statusCode = 400;
+    return { Message: "replacing id is not allowed" };
+  }
+
+  return collection.documents.replace(body);
 };

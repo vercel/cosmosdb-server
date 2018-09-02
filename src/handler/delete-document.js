@@ -7,15 +7,11 @@ module.exports = (
   res: http$ServerResponse,
   { dbId, collId, docId }: { dbId: string, collId: string, docId: string }
 ) => {
-  const data = account
-    .database(dbId)
-    .collection(collId)
-    .document(docId)
-    .read();
-  if (!data) {
+  const collection = account.database(dbId).collection(collId);
+  if (!collection.document(docId).read()) {
     res.statusCode = 404;
     return {};
   }
 
-  return data;
+  return collection.documents.delete(docId);
 };

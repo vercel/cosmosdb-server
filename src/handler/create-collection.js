@@ -15,11 +15,21 @@ module.exports = async (
     return { Message: "missing id" };
   }
 
-  const collection = account.database(dbId).collection(collId);
-  if (!collection.read()) {
+  if (body.partitionKey && !Array.isArray(body.partitionKey.paths)) {
+    res.statusCode = 400;
+    return { Message: "invalid partitionKey" };
+  }
+
+  const database = account.database(dbId);
+  if (!database.read()) {
     res.statusCode = 404;
     return {};
   }
 
-  return collection.documents.upsert(body);
+  if (database.collection(collId).read()) {
+    res.statusCode = 409;
+    return { Message: "conflict" };
+  }
+
+  return database.collections.create(body);
 };

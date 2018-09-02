@@ -12,7 +12,7 @@ module.exports = (path: string, opts?: {}) => {
     const params = {};
     for (let i = 0, l = keys.length; i < l; i += 1) {
       const { name } = keys[i];
-      params[name] = m[i + 1];
+      params[name] = decodeURIComponent(m[i + 1]);
     }
     return params;
   };

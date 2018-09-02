@@ -1,14 +1,20 @@
 // @flow
+import type Account from "../account";
+
 module.exports = (
-  dbs: Map<string, Map<string, any>>,
+  account: Account,
   req: http$IncomingMessage,
   res: http$ServerResponse,
   { dbId, collId }: { dbId: string, collId: string }
 ) => {
-  const db = dbs.get(dbId) || new Map();
-  const coll = db.get(collId) || new Map();
-  return {
-    Documents: [...coll.values()],
-    _count: coll.size
-  };
+  const Documents = account
+    .database(dbId)
+    .collection(collId)
+    .documents.read();
+  if (!Documents) {
+    res.statusCode = 404;
+    return {};
+  }
+
+  return { Documents, _count: Documents.length };
 };

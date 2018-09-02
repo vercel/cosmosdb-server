@@ -12,7 +12,13 @@ module.exports = (rules: Object) => {
   });
 
   return (req: http$IncomingMessage) => {
-    const { pathname } = parse(req.url);
+    let { pathname } = parse(req.url);
+
+    // fix @azure/cosmos sends double slash url
+    if (pathname && pathname.slice(0, 2) === "//") {
+      pathname = pathname.slice(1);
+    }
+
     const isQuery =
       req.headers["x-ms-documentdb-isquery"] === "true" ||
       req.headers["content-type"] === "application/query+json";

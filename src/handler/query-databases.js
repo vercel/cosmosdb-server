@@ -1,15 +1,10 @@
 // @flow
-const query = require("@zeit/cosmosdb-query");
-const { INTERNAL_DB, DATABASES_COLL } = require("../constants");
+import type Account from "../account";
+
 const json = require("../json");
 
-module.exports = async (
-  dbs: Map<string, Map<string, any>>,
-  req: http$IncomingMessage
-) => {
+module.exports = async (account: Account, req: http$IncomingMessage) => {
   const body = await json(req);
-  const db = dbs.get(INTERNAL_DB) || new Map();
-  const coll = db.get(DATABASES_COLL) || new Map();
-  const Databases = query([...coll.values()], body);
+  const Databases = account.databases.query(body);
   return { Databases };
 };
