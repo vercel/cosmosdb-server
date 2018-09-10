@@ -21,6 +21,7 @@
     "lint-staged": "git diff --cached --diff-filter=d --name-only '*.js' | xargs eslint",
     "prepublish": "yarn build",
     "test": "best -I test/index.js -r flow-remove-types/register",
+    "test-old-sdk": "yarn build && ./test/old-sdk.sh",
     "test-sdk": "yarn build && ./test/sdk.sh"
   },
   "dependencies": {

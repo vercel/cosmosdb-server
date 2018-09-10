@@ -1,3 +1,6 @@
 [submodule "test/azure-cosmosdb-node"]
 	path = test/azure-cosmosdb-node
 	url = git@github.com:Azure/azure-cosmosdb-node.git
+[submodule "test/azure-cosmos-js"]
+	path = test/azure-cosmos-js
+	url = git@github.com:Azure/azure-cosmos-js.git
