@@ -1,20 +1,17 @@
 // @flow
 import type Account from "../account";
 
+const readItems = require("./_read-items");
+
 module.exports = (
   account: Account,
   req: http$IncomingMessage,
   res: http$ServerResponse,
   { dbId, collId }: { dbId: string, collId: string }
-) => {
-  const Documents = account
-    .database(dbId)
-    .collection(collId)
-    .documents.read();
-  if (!Documents) {
-    res.statusCode = 404;
-    return {};
-  }
-
-  return { Documents, _count: Documents.length };
-};
+) =>
+  readItems(req, res, "Documents", ({ continuation, maxItemCount }) =>
+    account
+      .database(dbId)
+      .collection(collId)
+      .documents.read({ continuation, maxItemCount })
+  );

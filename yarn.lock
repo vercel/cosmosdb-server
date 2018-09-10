@@ -118,9 +118,9 @@
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/@zeit/cosmos-utils/-/cosmos-utils-1.2.4.tgz#23b98feed667718055a89c3fcc51e04760167026"
 
-"@zeit/cosmosdb-query@0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@zeit/cosmosdb-query/-/cosmosdb-query-0.0.4.tgz#78678e1365b11b8e1d9ded0cb86a8e60fe6eb0dc"
+"@zeit/cosmosdb-query@0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@zeit/cosmosdb-query/-/cosmosdb-query-0.0.6.tgz#8405fddd1d4fa8b7dbe5002d32f1b1e747d69fa0"
   dependencies:
     "@babel/generator" "7.0.0"
     "@babel/traverse" "7.0.0"

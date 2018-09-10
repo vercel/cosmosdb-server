@@ -1,7 +1,13 @@
 // @flow
 import type Account from "../account";
 
-module.exports = (account: Account) => {
-  const Databases = account.databases.read();
-  return { Databases, _count: Databases.length };
-};
+const readItems = require("./_read-items");
+
+module.exports = (
+  account: Account,
+  req: http$IncomingMessage,
+  res: http$ServerResponse
+) =>
+  readItems(req, res, "Databases", ({ continuation, maxItemCount }) =>
+    account.databases.read({ continuation, maxItemCount })
+  );

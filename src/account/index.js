@@ -77,10 +77,31 @@ class Items<P: Item, I: Item> {
     return data ? query(params.query).exec(data, params.parameters) : null;
   }
 
-  read() {
-    return this._parent.read()
-      ? [...this._data.values()].map(item => item.read())
-      : null;
+  read({
+    maxItemCount,
+    continuation
+  }: {
+    maxItemCount?: ?number,
+    continuation?: ?{ token: string }
+  } = {}) {
+    if (!this._parent.read()) return null;
+
+    let data = [...this._data.values()];
+
+    if (continuation) {
+      const index = data.findIndex(
+        d => (d.read() || {})._rid === continuation.token
+      );
+      if (index >= 0) {
+        data = data.slice(index + 1);
+      }
+    }
+
+    if (maxItemCount != null) {
+      data = data.slice(0, maxItemCount);
+    }
+
+    return data.map(item => item.read());
   }
 
   replace(data: { id: string }) {
@@ -210,10 +231,6 @@ class Database extends Item {
 }
 
 class Databases extends Items<Account, Database> {
-  read() {
-    return [...this._data.values()].map(item => item.read());
-  }
-
   _newItem(data: ?ItemObject) {
     return new Database(data);
   }
@@ -227,7 +244,13 @@ class Account extends Item {
   databases: Databases;
 
   constructor() {
-    super();
+    super({
+      id: "",
+      _etag: "",
+      _rid: "",
+      _self: "",
+      _ts: 0
+    });
     this.databases = new Databases(this);
   }
 

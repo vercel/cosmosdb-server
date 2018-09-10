@@ -39,6 +39,7 @@ module.exports = () => {
         `https://${req.headers.host}/${req.url}`
       );
       res.setHeader("connection", "close");
+      res.setHeader("x-ms-request-charge", "1");
       res.end(JSON.stringify(body));
     })().catch(err => {
       // eslint-disable-next-line no-console
