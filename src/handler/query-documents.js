@@ -22,8 +22,8 @@ module.exports = async (
 
     if (req.headers["x-ms-documentdb-query-enablecrosspartition"] !== "true") {
       const { partitionKey } = collection.read() || {};
-      const paths = partitionKey ? partitionKey.paths : [];
-      if (!query(body.query).containsPartitionKeys(paths || [])) {
+      const paths = (partitionKey || {}).paths || [];
+      if (paths.length && !query(body.query).containsPartitionKeys(paths)) {
         res.statusCode = 400;
         return { Message: "missing partition keys" };
       }
