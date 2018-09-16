@@ -18,6 +18,28 @@ function ts() {
   return Math.floor(Date.now() / 1e3);
 }
 
+function range(
+  data: any[],
+  {
+    maxItemCount,
+    continuation
+  }: {
+    maxItemCount?: ?number,
+    continuation?: ?{ token: string }
+  }
+) {
+  let _data = data;
+
+  if (continuation) {
+    const index = data.findIndex(d => (d || {})._rid === continuation.token);
+    if (index >= 0) {
+      _data = data.slice(index + 1);
+    }
+  }
+
+  return maxItemCount != null ? _data.slice(0, maxItemCount) : _data;
+}
+
 class Item {
   _data: ?ItemObject;
 
@@ -69,12 +91,24 @@ class Items<P: Item, I: Item> {
     this._data.delete(data._rid);
   }
 
-  query(params: {
-    query: string,
-    parameters?: { name: string, value: any }[]
-  }) {
+  query(
+    params: {
+      query: string,
+      parameters?: { name: string, value: any }[]
+    },
+    {
+      maxItemCount,
+      continuation
+    }: {
+      maxItemCount?: ?number,
+      continuation?: ?{ token: string }
+    }
+  ) {
     const data = this.read();
-    return data ? query(params.query).exec(data, params.parameters) : null;
+    if (!data) return null;
+
+    const _data = query(params.query).exec(data, params.parameters);
+    return range(_data, { maxItemCount, continuation });
   }
 
   read({
@@ -86,22 +120,9 @@ class Items<P: Item, I: Item> {
   } = {}) {
     if (!this._parent.read()) return null;
 
-    let data = [...this._data.values()];
-
-    if (continuation) {
-      const index = data.findIndex(
-        d => (d.read() || {})._rid === continuation.token
-      );
-      if (index >= 0) {
-        data = data.slice(index + 1);
-      }
-    }
-
-    if (maxItemCount != null) {
-      data = data.slice(0, maxItemCount);
-    }
-
-    return data.map(item => item.read());
+    const data = [...this._data.values()];
+    const _data = data.map(item => item.read());
+    return range(_data, { maxItemCount, continuation });
   }
 
   replace(data: { id: string }) {

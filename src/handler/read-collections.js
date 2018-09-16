@@ -9,6 +9,10 @@ module.exports = (
   res: http$ServerResponse,
   { dbId }: { dbId: string }
 ) =>
-  readItems(req, res, "DocumentCollections", ({ continuation, maxItemCount }) =>
-    account.database(dbId).collections.read({ continuation, maxItemCount })
+  readItems(
+    req,
+    res,
+    "DocumentCollections",
+    async ({ continuation, maxItemCount }) =>
+      account.database(dbId).collections.read({ continuation, maxItemCount })
   );

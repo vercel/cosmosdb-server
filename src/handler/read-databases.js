@@ -8,6 +8,6 @@ module.exports = (
   req: http$IncomingMessage,
   res: http$ServerResponse
 ) =>
-  readItems(req, res, "Databases", ({ continuation, maxItemCount }) =>
+  readItems(req, res, "Databases", async ({ continuation, maxItemCount }) =>
     account.databases.read({ continuation, maxItemCount })
   );

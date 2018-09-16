@@ -36,7 +36,7 @@ module.exports = () => {
       res.setHeader("content-type", "application/json");
       res.setHeader(
         "content-location",
-        `https://${req.headers.host}/${req.url}`
+        `https://${req.headers.host}${req.url}`
       );
       res.setHeader("connection", "close");
       res.setHeader("x-ms-request-charge", "1");

@@ -22,13 +22,19 @@ module.exports = async (
   req: http$IncomingMessage,
   res: http$ServerResponse,
   itemsName: string,
-  fn: ({ maxItemCount?: ?number, continuation?: ?Object }) => ?(any[])
+  fn: ({ maxItemCount?: ?number, continuation?: ?Object }) => ?Promise<
+    any[] | {} | null
+  >
 ) => {
   const { maxItemCount, continuation } = parseHeaders(req.headers);
   const items = await fn({ maxItemCount, continuation });
   if (!items) {
     res.statusCode = 404;
     return {};
+  }
+
+  if (!Array.isArray(items)) {
+    return items;
   }
 
   const count = items.length;
