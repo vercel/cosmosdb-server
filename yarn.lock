@@ -114,9 +114,9 @@
     globby "8.0.0"
     signal-exit "3.0.2"
 
-"@zeit/cosmosdb-query@0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@zeit/cosmosdb-query/-/cosmosdb-query-0.0.9.tgz#e86bd23c7077176dcaf8108d961c1aeacb125541"
+"@zeit/cosmosdb-query@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@zeit/cosmosdb-query/-/cosmosdb-query-0.1.0.tgz#4498aa1dcb283660f875a6dd1736731db08310a3"
   dependencies:
     "@babel/generator" "7.0.0"
     "@babel/traverse" "7.0.0"

@@ -25,7 +25,7 @@
     "test-sdk": "yarn build && ./test/sdk.sh"
   },
   "dependencies": {
-    "@zeit/cosmosdb-query": "0.0.9",
+    "@zeit/cosmosdb-query": "0.1.0",
     "path-to-regexp": "2.4.0",
     "raw-body": "2.3.3",
     "uuid": "3.3.2"

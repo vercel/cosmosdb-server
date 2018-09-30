@@ -107,7 +107,9 @@ class Items<P: Item, I: Item> {
     const data = this.read();
     if (!data) return null;
 
-    const _data = query(params.query).exec(data, params.parameters);
+    const _data = query(params.query).exec(data, {
+      parameters: params.parameters
+    });
     return range(_data, { maxItemCount, continuation });
   }
 
