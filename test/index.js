@@ -81,3 +81,22 @@ exports.readDocuments = withTestEnv(async client => {
     assert(r._etag);
   }
 });
+
+exports.udf = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "test-database" });
+  const { container } = await database.containers.create({
+    id: "test-collection"
+  });
+  await container.userDefinedFunctions.create({
+    id: "REGEX_MATCH",
+    body: `
+      function(input, pattern) {
+        return input.match(pattern) !== null
+      }
+    `
+  });
+  const { result } = await container.items
+    .query(`SELECT VALUE udf.REGEX_MATCH("foobar", ".*bar")`)
+    .toArray();
+  assert.deepStrictEqual(result, [true]);
+});
