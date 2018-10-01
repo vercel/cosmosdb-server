@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 readonly port="$((RANDOM + 3000))"
