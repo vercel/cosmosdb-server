@@ -16,5 +16,10 @@ module.exports = async (
     return {};
   }
 
+  res.setHeader('x-ms-documentdb-collection-index-transformation-progress', '-1')
+  if (coll.indexingPolicy && coll.indexingPolicy.indexingMode === 'lazy') {
+    res.setHeader('x-ms-documentdb-collection-lazy-indexing-progress', '-1')
+  }
+
   return coll;
 };
