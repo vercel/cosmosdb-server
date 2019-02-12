@@ -19,12 +19,17 @@ module.exports = (rules: Object) => {
       pathname = pathname.slice(1);
     }
 
-    const isQuery =
+    let { method } = req;
+    if (
       req.headers["x-ms-documentdb-isquery"] === "true" ||
-      req.headers["content-type"] === "application/query+json";
+      req.headers["content-type"] === "application/query+json"
+    ) {
+      method += "_QUERY";
+    } else if (req.headers["x-ms-documentdb-is-upsert"] === "true") {
+      method += "_UPSERT";
+    }
 
-    const methodRoutes =
-      routes[`${req.method}${isQuery ? "_QUERY" : ""}`] || [];
+    const methodRoutes = routes[method] || [];
     for (let i = 0, l = methodRoutes.length; i < l; i += 1) {
       const [match, handler] = methodRoutes[i];
       const params = match(pathname);

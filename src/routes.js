@@ -1,5 +1,7 @@
 const createCollection = require("./handler/create-collection");
 const createDatabase = require("./handler/create-database");
+const createDocument = require("./handler/create-document");
+const createUserDefinedFunction = require("./handler/create-user-defined-function");
 const deleteCollection = require("./handler/delete-collection");
 const deleteDocument = require("./handler/delete-document");
 const deleteDatabase = require("./handler/delete-database");
@@ -43,10 +45,14 @@ module.exports = router({
     "/": readMeta
   },
   POST: {
-    "/dbs/:dbId/colls/:collId/docs": upsertDocument,
-    "/dbs/:dbId/colls/:collId/udfs": upsertUserDefinedFunction,
+    "/dbs/:dbId/colls/:collId/docs": createDocument,
+    "/dbs/:dbId/colls/:collId/udfs": createUserDefinedFunction,
     "/dbs/:dbId/colls": createCollection,
     "/dbs": createDatabase
+  },
+  POST_UPSERT: {
+    "/dbs/:dbId/colls/:collId/docs": upsertDocument,
+    "/dbs/:dbId/colls/:collId/udfs": upsertUserDefinedFunction
   },
   POST_QUERY: {
     "/dbs/:dbId/colls/:collId/docs": queryDocuments,

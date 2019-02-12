@@ -27,6 +27,7 @@ module.exports = () => {
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error(err);
+          body = { Message: err.message };
           res.statusCode = 500;
         }
       } else {

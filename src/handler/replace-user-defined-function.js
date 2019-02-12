@@ -22,10 +22,14 @@ module.exports = async (
     return {};
   }
 
-  if (data.id !== body.id) {
-    res.statusCode = 400;
-    return { Message: "replacing id is not allowed" };
-  }
+  try {
+    return collection.userDefinedFunctions.replace(body);
+  } catch (err) {
+    if (err.badRequest) {
+      res.statusCode = 400;
+      return { Message: err.message };
+    }
 
-  return collection.userDefinedFunctions.replace(body);
+    throw err;
+  }
 };

@@ -48,7 +48,12 @@ module.exports = class Items<P: Item, I: Item> {
 
   create(data: Object) {
     if (this._item(data.id).read()) {
-      throw new Error("already exist");
+      const err = new Error(
+        "Resource with specified id or name already exists."
+      );
+      // $FlowFixMe
+      err.conflict = true;
+      throw err;
     }
 
     const _rid = this._rid();
@@ -112,8 +117,11 @@ module.exports = class Items<P: Item, I: Item> {
 
   replace(data: Object) {
     const oldData = this._item(data.id).read();
-    if (!oldData) {
-      throw new Error("does not exist");
+    if (!oldData || data.id !== oldData.id) {
+      const err = new Error("replacing id is not allowed");
+      // $FlowFixMe
+      err.badRequest = true;
+      throw err;
     }
 
     const { _rid, _self } = oldData;

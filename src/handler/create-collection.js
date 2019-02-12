@@ -7,7 +7,7 @@ module.exports = async (
   account: Account,
   req: http$IncomingMessage,
   res: http$ServerResponse,
-  { dbId, collId }: { dbId: string, collId: string }
+  { dbId }: { dbId: string }
 ) => {
   const body = await json(req);
   if (!body.id) {
@@ -26,7 +26,7 @@ module.exports = async (
     return {};
   }
 
-  if (database.collection(collId).read()) {
+  if (database.collection(body.id).read()) {
     res.statusCode = 409;
     return { Message: "conflict" };
   }
