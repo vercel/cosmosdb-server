@@ -1,7 +1,6 @@
 // @flow
 import type Account from "../account";
 
-const assert = require("assert");
 const json = require("../json");
 
 module.exports = async (
@@ -16,25 +15,17 @@ module.exports = async (
     return { Message: "missing id" };
   }
 
-  const database = account.database(dbId);
-  const data = database.collection(collId).read();
-  if (!data) {
+  const collection = account.database(dbId).collection(collId);
+  if (!collection.read()) {
     res.statusCode = 404;
     return {};
   }
 
   try {
-    assert.deepStrictEqual(body.partitionKey, data.partitionKey);
+    return collection.documents.create(body);
   } catch (err) {
-    res.statusCode = 400;
-    return { Message: "replacing partitionKey is not allowed" };
-  }
-
-  try {
-    return database.collections.replace(body);
-  } catch (err) {
-    if (err.badRequest) {
-      res.statusCode = 400;
+    if (err.conflict) {
+      res.statusCode = 409;
       return { Message: err.message };
     }
 

@@ -45,6 +45,11 @@ module.exports = class UserDefinedFunctions extends Items<
     return super.replace({ id, body });
   }
 
+  create({ id, body }: { id: string, body: string }) {
+    this.functions[id] = define(body);
+    return super.create({ id, body });
+  }
+
   upsert({ id, body }: { id: string, body: string }) {
     this.functions[id] = define(body);
     return super.upsert({ id, body });
