@@ -14,7 +14,10 @@ module.exports = (
     .read();
   if (!data) {
     res.statusCode = 404;
-    return {};
+    return {
+        code: "NotFound",
+        message: "Entity with the specified id does not exist in the system.,"
+    };
   }
 
   return data;
