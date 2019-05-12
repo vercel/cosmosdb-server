@@ -14,7 +14,8 @@
     "cosmosdb-server": "bin/cosmosdb-server.js"
   },
   "scripts": {
-    "build": "flow-remove-types src/ -d lib/",
+    "build": "flow-remove-types src/ -d lib/ && yarn copy-types",
+    "copy-types": "copyfiles -u 1 './src/**/*.d.ts' lib",
     "format": "prettier --ignore-path .gitignore --write '{bin,src,test}/**/*.js'",
     "format-staged": "git diff --cached --diff-filter=d --name-only '*.js' | xargs prettier --list-different",
     "lint": "eslint --ignore-path .gitignore .",
@@ -36,6 +37,7 @@
     "@zeit/best": "0.4.3",
     "@zeit/git-hooks": "0.1.4",
     "babel-eslint": "9.0.0",
+    "copyfiles": "2.1.0",
     "eslint": "5.5.0",
     "eslint-config-airbnb": "17.1.0",
     "eslint-config-prettier": "3.0.1",
