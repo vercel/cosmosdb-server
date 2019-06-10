@@ -26,7 +26,7 @@ module.exports = async (
   } catch (err) {
     if (err.conflict) {
       res.statusCode = 409;
-      return { Message: err.message };
+      return { code: "Conflict", message: err.message };
     }
 
     throw err;
