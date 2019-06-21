@@ -7,7 +7,7 @@ const readItems = require("./_read-items");
 
 module.exports = async (
   account: Account,
-  req: http$IncomingMessage,
+  req: http$IncomingMessage<>,
   res: http$ServerResponse,
   { dbId, collId }: { dbId: string, collId: string }
 ) =>

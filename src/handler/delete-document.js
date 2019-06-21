@@ -3,7 +3,7 @@ import type Account from "../account";
 
 module.exports = (
   account: Account,
-  req: http$IncomingMessage,
+  req: http$IncomingMessage<>,
   res: http$ServerResponse,
   { dbId, collId, docId }: { dbId: string, collId: string, docId: string }
 ) => {

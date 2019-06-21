@@ -5,7 +5,7 @@ const readItems = require("./_read-items");
 
 module.exports = (
   account: Account,
-  req: http$IncomingMessage,
+  req: http$IncomingMessage<>,
   res: http$ServerResponse,
   { dbId }: { dbId: string }
 ) =>

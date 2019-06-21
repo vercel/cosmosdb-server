@@ -3,7 +3,7 @@ import type Account from "../account";
 
 module.exports = (
   account: Account,
-  req: http$IncomingMessage,
+  req: http$IncomingMessage<>,
   res: http$ServerResponse,
   { dbId, collId, docId }: { dbId: string, collId: string, docId: string }
 ) => {
@@ -15,8 +15,8 @@ module.exports = (
   if (!data) {
     res.statusCode = 404;
     return {
-        code: "NotFound",
-        message: "Entity with the specified id does not exist in the system.,"
+      code: "NotFound",
+      message: "Entity with the specified id does not exist in the system.,"
     };
   }
 

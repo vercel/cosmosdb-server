@@ -27,26 +27,26 @@
   },
   "dependencies": {
     "@zeit/cosmosdb-query": "0.1.0",
-    "path-to-regexp": "2.4.0",
-    "raw-body": "2.3.3",
+    "path-to-regexp": "3.0.0",
+    "raw-body": "2.4.0",
     "uuid": "3.3.2"
   },
   "devDependencies": {
-    "@azure/cosmos": "2.0.0-4",
-    "@zeit/best": "0.4.3",
+    "@azure/cosmos": "2.1.5",
+    "@zeit/best": "0.6.1",
     "@zeit/git-hooks": "0.1.4",
-    "babel-eslint": "9.0.0",
+    "babel-eslint": "10.0.2",
     "copyfiles": "2.1.0",
-    "eslint": "5.5.0",
+    "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
-    "eslint-config-prettier": "3.0.1",
-    "eslint-plugin-flowtype": "2.50.0",
-    "eslint-plugin-import": "2.14.0",
-    "eslint-plugin-jsx-a11y": "6.1.1",
-    "eslint-plugin-react": "7.11.1",
-    "flow-bin": "0.80.0",
-    "flow-remove-types": "1.2.3",
-    "prettier": "1.14.2"
+    "eslint-config-prettier": "5.0.0",
+    "eslint-plugin-flowtype": "3.10.3",
+    "eslint-plugin-import": "2.17.3",
+    "eslint-plugin-jsx-a11y": "6.2.1",
+    "eslint-plugin-react": "7.13.0",
+    "flow-bin": "0.101.1",
+    "flow-remove-types": "2.101.0",
+    "prettier": "1.18.2"
   },
   "eslintConfig": {
     "extends": [

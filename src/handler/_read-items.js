@@ -19,7 +19,7 @@ const parseHeaders = (headers: Object) => {
 };
 
 module.exports = async (
-  req: http$IncomingMessage,
+  req: http$IncomingMessage<>,
   res: http$ServerResponse,
   itemsName: string,
   fn: ({ maxItemCount?: ?number, continuation?: ?Object }) => ?Promise<

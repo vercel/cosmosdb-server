@@ -158,7 +158,7 @@ module.exports = class Items<P: Item, I: Item> {
   }
 
   // eslint-disable-next-line no-unused-vars
-  _self(rid) {
+  _self(rid: string) {
     throw new Error("Not implemented");
   }
 

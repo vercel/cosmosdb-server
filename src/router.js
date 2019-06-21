@@ -5,13 +5,14 @@ const pathMatch = require("./path-match");
 module.exports = (rules: Object) => {
   const routes = {};
   Object.entries(rules).forEach(([method, route]) => {
+    // $FlowFixMe
     routes[method] = Object.entries(route).map(([path, handler]) => [
       pathMatch(path),
       handler
     ]);
   });
 
-  return (req: http$IncomingMessage) => {
+  return (req: http$IncomingMessage<>) => {
     let { pathname } = parse(req.url);
 
     // fix @azure/cosmos sends double slash url

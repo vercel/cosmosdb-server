@@ -8,7 +8,7 @@ module.exports = function withCosmosDBServer(fn: (...any) => any) {
   return async (...args: any[]) => {
     const server = cosmosDBServerMock();
     await new Promise(resolve => {
-      server.listen(resolve);
+      server.listen(0, resolve);
     });
     const { port } = server.address();
 

@@ -3,7 +3,7 @@ import type Account from "../account";
 
 module.exports = async (
   account: Account,
-  req: http$IncomingMessage,
+  req: http$IncomingMessage<>,
   res: http$ServerResponse,
   { dbId, collId }: { dbId: string, collId: string }
 ) => {
@@ -16,9 +16,12 @@ module.exports = async (
     return {};
   }
 
-  res.setHeader('x-ms-documentdb-collection-index-transformation-progress', '-1')
-  if (coll.indexingPolicy && coll.indexingPolicy.indexingMode === 'lazy') {
-    res.setHeader('x-ms-documentdb-collection-lazy-indexing-progress', '-1')
+  res.setHeader(
+    "x-ms-documentdb-collection-index-transformation-progress",
+    "-1"
+  );
+  if (coll.indexingPolicy && coll.indexingPolicy.indexingMode === "lazy") {
+    res.setHeader("x-ms-documentdb-collection-lazy-indexing-progress", "-1");
   }
 
   return coll;

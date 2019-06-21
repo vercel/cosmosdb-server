@@ -5,7 +5,7 @@ const json = require("../json");
 
 module.exports = async (
   account: Account,
-  req: http$IncomingMessage,
+  req: http$IncomingMessage<>,
   res: http$ServerResponse,
   { dbId, collId, docId }: { dbId: string, collId: string, docId: string }
 ) => {

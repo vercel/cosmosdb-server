@@ -3,7 +3,7 @@ import type Account from "../account";
 
 module.exports = async (
   account: Account,
-  req: http$IncomingMessage,
+  req: http$IncomingMessage<>,
   res: http$ServerResponse,
   { dbId }: { dbId: string }
 ) => {
