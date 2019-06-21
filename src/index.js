@@ -8,6 +8,7 @@ const routes = require("./routes");
 const options = {
   cert: readFileSync(join(__dirname, "..", "cert.pem")),
   key: readFileSync(join(__dirname, "..", "key.pem")),
+  minVersion: "TLSv1",
   rejectUnauthorized: false,
   requestCert: false
 };
