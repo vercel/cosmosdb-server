@@ -21,9 +21,8 @@
     "lint": "eslint --ignore-path .gitignore .",
     "lint-staged": "git diff --cached --diff-filter=d --name-only '*.js' | xargs eslint",
     "prepublish": "yarn build",
-    "test": "yarn test-base && yarn test-sdk && yarn test-old-sdk",
+    "test": "yarn test-base && yarn test-sdk",
     "test-base": "best -I test/index.js -r flow-remove-types/register",
-    "test-old-sdk": "yarn build && ./test/old-sdk.sh",
     "test-sdk": "yarn build && ./test/sdk.sh"
   },
   "dependencies": {
