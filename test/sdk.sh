@@ -3,7 +3,7 @@ set -euo pipefail
 
 readonly port="$((RANDOM + 3000))"
 trap 'kill -9 $pid' EXIT
-./bin/cosmosdb-server.js -p "$port" &
+ts-node ./src/cli.ts -p "$port" &
 pid=$!
 
 cd test/azure-cosmos-js

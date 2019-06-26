@@ -5,64 +5,63 @@
   "license": "UNLICENSED",
   "main": "lib/index.js",
   "files": [
-    "bin",
     "cert.pem",
     "key.pem",
     "lib"
   ],
   "bin": {
-    "cosmosdb-server": "bin/cosmosdb-server.js"
+    "cosmosdb-server": "lib/cli.js"
   },
   "scripts": {
-    "build": "flow-remove-types src/ -d lib/ && yarn copy-types",
-    "copy-types": "copyfiles -u 1 './src/**/*.d.ts' lib",
-    "format": "prettier --ignore-path .gitignore --write '{bin,src,test}/**/*.js'",
-    "format-staged": "git diff --cached --diff-filter=d --name-only '*.js' | xargs prettier --list-different",
-    "lint": "eslint --ignore-path .gitignore .",
-    "lint-staged": "git diff --cached --diff-filter=d --name-only '*.js' | xargs eslint",
+    "build": "tsc",
+    "format": "prettier --ignore-path .gitignore --write '{src,test}/**/*.ts'",
+    "format-staged": "git diff --cached --diff-filter=d --name-only '*.ts' | xargs prettier --list-different",
+    "lint": "eslint --ignore-path .gitignore '{src,test}/**/*.ts'",
+    "lint-staged": "git diff --cached --diff-filter=d --name-only '*.ts' | xargs eslint",
     "prepublish": "yarn build",
     "test": "yarn test-base && yarn test-sdk",
-    "test-base": "best -I test/index.js -r flow-remove-types/register",
-    "test-sdk": "yarn build && ./test/sdk.sh"
+    "test-base": "best -I test/index.ts -r ts-node/register",
+    "test-sdk": "./test/sdk.sh"
   },
   "dependencies": {
-    "@zeit/cosmosdb-query": "0.1.0",
+    "@zeit/cosmosdb-query": "0.2.0",
     "path-to-regexp": "3.0.0",
-    "raw-body": "2.4.0",
+    "raw-body": "2.4.1",
     "uuid": "3.3.2"
   },
   "devDependencies": {
-    "@azure/cosmos": "2.1.5",
-    "@zeit/best": "0.6.1",
+    "@azure/cosmos": "2.1.7",
+    "@babel/core": "7.4.5",
+    "@types/node": "12.0.10",
+    "@types/uuid": "3.4.4",
+    "@typescript-eslint/eslint-plugin": "1.11.0",
+    "@typescript-eslint/parser": "1.11.0",
+    "@zeit/best": "0.5.3",
     "@zeit/git-hooks": "0.1.4",
-    "babel-eslint": "10.0.2",
-    "copyfiles": "2.1.0",
-    "eslint": "5.16.0",
+    "eslint": "6.0.1",
     "eslint-config-airbnb": "17.1.0",
-    "eslint-config-prettier": "5.0.0",
-    "eslint-plugin-flowtype": "3.10.3",
-    "eslint-plugin-import": "2.17.3",
+    "eslint-config-prettier": "6.0.0",
+    "eslint-plugin-import": "2.18.0",
     "eslint-plugin-jsx-a11y": "6.2.1",
-    "eslint-plugin-react": "7.13.0",
-    "flow-bin": "0.101.1",
-    "flow-remove-types": "2.101.0",
-    "prettier": "1.18.2"
+    "eslint-plugin-react": "7.14.2",
+    "prettier": "1.18.2",
+    "ts-node": "8.3.0",
+    "typescript": "3.5.2"
   },
   "eslintConfig": {
     "extends": [
       "airbnb",
-      "plugin:flowtype/recommended",
       "prettier"
     ],
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "ecmaVersion": 2018
     },
     "plugins": [
-      "flowtype"
+      "@typescript-eslint"
     ],
     "rules": {
-      "flowtype/generic-spacing": 0,
+      "no-unused-vars": "off",
       "no-underscore-dangle": [
         "error",
         {
@@ -74,11 +73,17 @@
           ]
         }
       ]
+    },
+    "settings": {
+      "import/resolver": {
+        "node": {
+          "extensions": [".js", ".ts"]
+        }
+      }
     }
   },
   "git": {
     "pre-commit": [
-      "flow",
       "lint-staged",
       "format-staged"
     ]
