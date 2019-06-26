@@ -1,11 +1,11 @@
 /* eslint-disable global-require */
 import { CosmosClient } from "@azure/cosmos";
 import * as net from "net";
-import cosmosDBServerMock from "../src";
+import cosmosDBServer from "../src";
 
 export default function withCosmosDBServer(fn: (...args: any[]) => any) {
   return async (...args: any[]) => {
-    const server = cosmosDBServerMock();
+    const server = cosmosDBServer();
     await new Promise(resolve => {
       server.listen(0, resolve);
     });
