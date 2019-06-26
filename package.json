@@ -18,7 +18,7 @@
     "format-staged": "git diff --cached --diff-filter=d --name-only '*.ts' | xargs prettier --list-different",
     "lint": "eslint --ignore-path .gitignore '{src,test}/**/*.ts'",
     "lint-staged": "git diff --cached --diff-filter=d --name-only '*.ts' | xargs eslint",
-    "prepublish": "yarn build",
+    "prepublishOnly": "yarn build",
     "test": "yarn test-base && yarn test-sdk",
     "test-base": "best -I test/index.ts -r ts-node/register",
     "test-sdk": "./test/sdk.sh"
