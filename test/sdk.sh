@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-git submodule update --init --recursive
-
 readonly port="$((RANDOM + 3000))"
 trap 'kill -9 $pid' EXIT
 ts-node ./src/cli.ts -p "$port" &

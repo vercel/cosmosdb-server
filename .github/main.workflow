@@ -9,8 +9,13 @@ action "Build" {
   secrets = ["NPM_AUTH_TOKEN"]
 }
 
+action "Submodules" {
+  uses = "docker://alpine/git:latest"
+  args = "submodule update --init --recursive"
+}
+
 action "Test" {
-  needs = "Build"
+  needs = ["Build", "Submodules"]
   uses = "actions/npm@master"
   args = "test"
 }
