@@ -6,6 +6,7 @@ workflow "Build, Test, and Publish" {
 action "Build" {
   uses = "actions/npm@master"
   args = "install"
+  secrets = ["NPM_AUTH_TOKEN"]
 }
 
 action "Test" {
