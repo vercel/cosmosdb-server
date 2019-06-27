@@ -17,6 +17,7 @@ import readDatabases from "./handler/read-databases";
 import readDocument from "./handler/read-document";
 import readDocuments from "./handler/read-documents";
 import readMeta from "./handler/read-meta";
+import readPartitionKeyRanges from "./handler/read-partition-key-ranges";
 import readUserDefinedFunction from "./handler/read-user-defined-function";
 import readUserDefinedFunctions from "./handler/read-user-defined-functions";
 import replaceCollection from "./handler/replace-collection";
@@ -36,6 +37,7 @@ export default router({
   GET: {
     "/dbs/:dbId/colls/:collId/docs/:docId": readDocument,
     "/dbs/:dbId/colls/:collId/docs": readDocuments,
+    "/dbs/:dbId/colls/:collId/pkranges": readPartitionKeyRanges,
     "/dbs/:dbId/colls/:collId/udfs/:udfId": readUserDefinedFunction,
     "/dbs/:dbId/colls/:collId/udfs": readUserDefinedFunctions,
     "/dbs/:dbId/colls/:collId": readCollection,
