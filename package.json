@@ -2,9 +2,10 @@
   "name": "@zeit/cosmosdb-server",
   "version": "0.2.0",
   "description": "A Cosmos DB server implementation",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "repository": "github:zeit/cosmosdb-server",
   "files": [
     "cert.pem",
     "key.pem",
