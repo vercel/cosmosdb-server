@@ -22,35 +22,29 @@ export default async (
   req: http.IncomingMessage,
   res: http.ServerResponse,
   itemsName: string,
-  fn: (x0: {
+  fn: (arg: {
     maxItemCount?: number | null;
     continuation?: {
       token: string;
     } | null;
-  }) => Promise<any[] | {} | null> | undefined | null
+  }) => Promise<any> | any
 ) => {
   const { maxItemCount, continuation } = parseHeaders(req.headers);
-  const items = await fn({ maxItemCount, continuation });
-  if (!items) {
+  const result = await fn({ maxItemCount, continuation });
+  if (!result) {
     res.statusCode = 404;
     return {};
   }
 
-  if (!Array.isArray(items)) {
-    return items;
+  if (!result.result) {
+    return result;
   }
 
-  const count = items.length;
-  if (maxItemCount && count === maxItemCount) {
-    res.setHeader(
-      "x-ms-continuation",
-      JSON.stringify({
-        token: items[count - 1]._rid,
-        range: { min: "", max: "FF" }
-      })
-    );
+  const count = result.result.length;
+  if (result.continuation) {
+    res.setHeader("x-ms-continuation", JSON.stringify(result.continuation));
   }
   res.setHeader("x-ms-item-count", String(count));
 
-  return { [itemsName]: items, _count: count };
+  return { [itemsName]: result.result, _count: count };
 };

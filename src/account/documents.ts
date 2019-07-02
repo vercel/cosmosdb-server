@@ -15,7 +15,7 @@ export default class Documents extends Items<Collection, Document> {
       throw new Error("parent is missing");
     }
 
-    return `${parent._self}/docs/${rid}`;
+    return `${parent._self}/docs/${rid}/`;
   }
 
   _userDefinedFunctions() {

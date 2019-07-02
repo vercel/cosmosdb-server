@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this, no-underscore-dangle, no-use-before-define */
 import query from "@zeit/cosmosdb-query";
+import base64Lex from "base64-lex";
 import { randomBytes } from "crypto";
 import uuid from "uuid/v1";
 import ItemObject from "./item-object";
@@ -9,30 +10,6 @@ function ts() {
   return Math.floor(Date.now() / 1e3);
 }
 
-function range(
-  data: any[],
-  {
-    maxItemCount,
-    continuation
-  }: {
-    maxItemCount?: number | null;
-    continuation?: {
-      token: string;
-    } | null;
-  }
-): any[] {
-  let _data = data;
-
-  if (continuation) {
-    const index = data.findIndex(d => (d || {})._rid === continuation.token);
-    if (index >= 0) {
-      _data = data.slice(index + 1);
-    }
-  }
-
-  return maxItemCount != null ? _data.slice(0, maxItemCount) : _data;
-}
-
 export default class Items<P extends Item, I extends Item> {
   _parent: P;
 
@@ -40,10 +17,16 @@ export default class Items<P extends Item, I extends Item> {
 
   _index: Map<string, string>;
 
+  _ridPrefix: string;
+
+  _ridCount: number;
+
   constructor(parent: P) {
     this._parent = parent;
     this._data = new Map();
     this._index = new Map();
+    this._ridPrefix = base64Lex.encode(randomBytes(4));
+    this._ridCount = 0;
   }
 
   create(data: { [x: string]: any }) {
@@ -96,15 +79,16 @@ export default class Items<P extends Item, I extends Item> {
       } | null;
     }
   ) {
-    const data = this.read();
-    if (!data) return null;
+    if (!this._parent.read()) return null;
 
+    const data = [...this._data.values()].map(item => item.read());
     const udf = this._userDefinedFunctions();
-    const _data = query(params.query).exec(data, {
+    return query(params.query).exec(data, {
       parameters: params.parameters,
-      udf
+      udf,
+      maxItemCount,
+      continuation
     });
-    return range(_data, { maxItemCount, continuation });
   }
 
   read({
@@ -118,9 +102,8 @@ export default class Items<P extends Item, I extends Item> {
   } = {}) {
     if (!this._parent.read()) return null;
 
-    const data = [...this._data.values()];
-    const _data = data.map(item => item.read());
-    return range(_data, { maxItemCount, continuation });
+    const data = [...this._data.values()].map(item => item.read());
+    return query("SELECT * FROM c").exec(data, { maxItemCount, continuation });
   }
 
   replace(data: { [x: string]: any }) {
@@ -160,10 +143,11 @@ export default class Items<P extends Item, I extends Item> {
   }
 
   _rid() {
-    return randomBytes(8)
-      .toString("base64")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_");
+    const rid =
+      this._ridPrefix +
+      base64Lex.encode(String(this._ridCount).padStart(10, "0"));
+    this._ridCount += 1;
+    return rid;
   }
 
   // eslint-disable-next-line no-unused-vars

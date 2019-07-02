@@ -214,10 +214,10 @@
     signal-exit "3.0.2"
     strip-ansi "^5.0.0"
 
-"@zeit/cosmosdb-query@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@zeit/cosmosdb-query/-/cosmosdb-query-0.2.0.tgz#1a92d212a4b238b038d7c5c4db3e7176e5a4e1cb"
-  integrity sha512-VIM4CFX3kZq1agdLV13gxivkYzMa41Ndy43DaaO3nN6XRm4vkgHMdDA37j2RHUu1+E14xieIRsNPhFd7X3Swsw==
+"@zeit/cosmosdb-query@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@zeit/cosmosdb-query/-/cosmosdb-query-0.3.0.tgz#eba2d2dcadca82ed612d44628de5ba8a7e63b9f1"
+  integrity sha512-Pho72hhgCGlXki4jJIQaRf4JERG3C9yMbm79RVtjb1Dp1bIlXbbWCGhAON8/kHBkrWFSlwvss600lXD2K5t+Ng==
   dependencies:
     "@babel/generator" "7.4.4"
     "@babel/traverse" "7.4.5"
@@ -352,6 +352,11 @@ axobject-query@^2.0.2:
 balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
+
+base64-lex@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/base64-lex/-/base64-lex-1.0.0.tgz#86425c610497bc35b9edbfd1368fe8b20aaa33e3"
+  integrity sha1-hkJcYQSXvDW57b/RNo/osgqqM+M=
 
 base@^0.11.1:
   version "0.11.2"
