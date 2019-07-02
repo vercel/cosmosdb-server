@@ -35,6 +35,6 @@ action "Tag" {
 action "Publish" {
   needs = "Tag"
   uses = "actions/npm@master"
-  args = "publish"
+  args = "publish --access public --unsafe-perm"
   secrets = ["NPM_AUTH_TOKEN"]
 }
