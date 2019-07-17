@@ -34,22 +34,22 @@
   },
   "devDependencies": {
     "@azure/cosmos": "2.1.7",
-    "@babel/core": "7.4.5",
-    "@types/node": "12.0.10",
-    "@types/uuid": "3.4.4",
-    "@typescript-eslint/eslint-plugin": "1.11.0",
-    "@typescript-eslint/parser": "1.11.0",
+    "@babel/core": "7.5.4",
+    "@types/node": "12.6.6",
+    "@types/uuid": "3.4.5",
+    "@typescript-eslint/eslint-plugin": "1.12.0",
+    "@typescript-eslint/parser": "1.12.0",
     "@zeit/best": "0.5.3",
     "@zeit/git-hooks": "0.1.4",
     "eslint": "6.0.1",
-    "eslint-config-airbnb": "17.1.0",
+    "eslint-config-airbnb": "17.1.1",
     "eslint-config-prettier": "6.0.0",
     "eslint-plugin-import": "2.18.0",
-    "eslint-plugin-jsx-a11y": "6.2.1",
+    "eslint-plugin-jsx-a11y": "6.2.3",
     "eslint-plugin-react": "7.14.2",
     "prettier": "1.18.2",
     "ts-node": "8.3.0",
-    "typescript": "3.5.2"
+    "typescript": "3.5.3"
   },
   "eslintConfig": {
     "extends": [
