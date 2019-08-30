@@ -22,34 +22,34 @@
     "lint-staged": "git diff --cached --diff-filter=d --name-only '*.ts' | xargs eslint",
     "prepublishOnly": "yarn build",
     "test": "yarn test-base && yarn test-sdk",
-    "test-base": "best -I test/index.ts -r ts-node/register",
+    "test-base": "best -I test/index.ts -r ts-node/register --verbose",
     "test-sdk": "./test/sdk.sh"
   },
   "dependencies": {
-    "@zeit/cosmosdb-query": "0.3.0",
+    "@zeit/cosmosdb-query": "0.3.1",
     "base64-lex": "1.0.0",
     "path-to-regexp": "3.0.0",
     "raw-body": "2.4.1",
-    "uuid": "3.3.2"
+    "uuid": "3.3.3"
   },
   "devDependencies": {
-    "@azure/cosmos": "2.1.7",
-    "@babel/core": "7.5.4",
-    "@types/node": "12.6.6",
+    "@azure/cosmos": "3.2.0",
+    "@babel/core": "7.5.5",
+    "@types/node": "12.7.3",
     "@types/uuid": "3.4.5",
-    "@typescript-eslint/eslint-plugin": "1.12.0",
-    "@typescript-eslint/parser": "1.12.0",
+    "@typescript-eslint/eslint-plugin": "2.0.0",
+    "@typescript-eslint/parser": "2.0.0",
     "@zeit/best": "0.5.3",
     "@zeit/git-hooks": "0.1.4",
-    "eslint": "6.0.1",
-    "eslint-config-airbnb": "17.1.1",
-    "eslint-config-prettier": "6.0.0",
-    "eslint-plugin-import": "2.18.0",
+    "eslint": "6.2.2",
+    "eslint-config-airbnb": "18.0.1",
+    "eslint-config-prettier": "6.1.0",
+    "eslint-plugin-import": "2.18.2",
     "eslint-plugin-jsx-a11y": "6.2.3",
-    "eslint-plugin-react": "7.14.2",
+    "eslint-plugin-react": "7.14.3",
     "prettier": "1.18.2",
     "ts-node": "8.3.0",
-    "typescript": "3.5.3"
+    "typescript": "3.6.2"
   },
   "eslintConfig": {
     "extends": [

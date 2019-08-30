@@ -14,12 +14,9 @@ export const readDocument404 = withTestEnv(async client => {
   });
   const item = container.item("not-exist");
 
-  try {
-    await item.read();
-    assert.fail();
-  } catch (err) {
-    assert.equal(err.code, 404);
-  }
+  const { resource, statusCode } = await item.read();
+  assert.strictEqual(resource, undefined);
+  assert.strictEqual(statusCode, 404);
 });
 
 export const upsertDocument = withTestEnv(async client => {
@@ -28,10 +25,11 @@ export const upsertDocument = withTestEnv(async client => {
     id: "test-collection"
   });
   await container.items.upsert({ id: "test", text: "hi" });
-  const { body } = await container.item("test").read();
-  assert.strictEqual(body.id, "test");
-  assert.strictEqual(body.text, "hi");
-  assert(body._etag);
+  const { resource } = await container.item("test").read();
+
+  assert.strictEqual(resource.id, "test");
+  assert.strictEqual(resource.text, "hi");
+  assert(resource._etag);
 });
 
 export const upsertDocumentUpdate = withTestEnv(async client => {
@@ -41,10 +39,10 @@ export const upsertDocumentUpdate = withTestEnv(async client => {
   });
   await container.items.upsert({ id: "test", text: "hi" });
   await container.items.upsert({ id: "test", text: "hello" });
-  const { body } = await container.item("test").read();
-  assert.strictEqual(body.id, "test");
-  assert.strictEqual(body.text, "hello");
-  assert(body._etag);
+  const { resource } = await container.item("test").read();
+  assert.strictEqual(resource.id, "test");
+  assert.strictEqual(resource.text, "hello");
+  assert(resource._etag);
 });
 
 export const readDocumentsEmpty = withTestEnv(async client => {
@@ -52,8 +50,8 @@ export const readDocumentsEmpty = withTestEnv(async client => {
   const { container } = await database.containers.create({
     id: "test-collection"
   });
-  const { result } = await container.items.readAll().toArray();
-  assert.deepStrictEqual(result, []);
+  const { resources } = await container.items.readAll().fetchAll();
+  assert.deepStrictEqual(resources, []);
 });
 
 export const readDocuments = withTestEnv(async client => {
@@ -67,9 +65,9 @@ export const readDocuments = withTestEnv(async client => {
     { id: "test3", text: "baz", n: 3 }
   ];
   await Promise.all(data.map(d => container.items.upsert(d)));
-  const { result } = await container.items.readAll().toArray();
-  assert.strictEqual(result.length, data.length);
-  const sortedResult = result.sort(
+  const { resources } = await container.items.readAll().fetchAll();
+  assert.strictEqual(resources.length, data.length);
+  const sortedResult = resources.sort(
     (a: { n: number }, b: { n: number }) => a.n - b.n
   );
   for (let i = 0, l = sortedResult.length; i < l; i += 1) {
@@ -86,7 +84,7 @@ export const udf = withTestEnv(async client => {
   const { container } = await database.containers.create({
     id: "test-collection"
   });
-  await container.userDefinedFunctions.create({
+  await container.scripts.userDefinedFunctions.create({
     id: "REGEX_MATCH",
     body: `
       function(input, pattern) {
@@ -94,8 +92,8 @@ export const udf = withTestEnv(async client => {
       }
     `
   });
-  const { result } = await container.items
+  const { resources } = await container.items
     .query(`SELECT VALUE udf.REGEX_MATCH("foobar", ".*bar")`)
-    .toArray();
-  assert.deepStrictEqual(result, [true]);
+    .fetchAll();
+  assert.deepStrictEqual(resources, [true]);
 });

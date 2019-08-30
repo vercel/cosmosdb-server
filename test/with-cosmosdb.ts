@@ -13,9 +13,7 @@ export default function withCosmosDBServer(fn: (...args: any[]) => any) {
 
     const client = new CosmosClient({
       endpoint: `https://localhost:${port}`,
-      auth: {
-        masterKey: "test-master-key"
-      }
+      key: "test-master-key"
     });
 
     try {
