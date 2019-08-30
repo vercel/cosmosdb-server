@@ -19,9 +19,7 @@ cosmosServer().listen(3000, () => {
 async function runClient() {
   const client = new CosmosClient({
     endpoint: `https://localhost:3000`,
-    auth: {
-      masterKey: "test key" // dummy key
-    }
+    key: "dummy key"
   });
 
   // initialize databases since the server is always empty when it boots
