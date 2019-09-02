@@ -3,6 +3,7 @@ import Collection from "./collection";
 import ItemObject from "./item-object";
 import Items from "./items";
 import UserDefinedFunction from "./user-defined-function";
+import ResourceId from "./resource-id";
 
 function define(body: string) {
   // eslint-disable-next-line no-new-func
@@ -24,6 +25,13 @@ export default class UserDefinedFunctions extends Items<
 
   _newItem(data: ItemObject | undefined | null) {
     return new UserDefinedFunction(data);
+  }
+
+  _rid(id: string) {
+    const collection = this._parent.read();
+    const rid = ResourceId.parse(collection._rid);
+    rid.userDefinedFunction = id;
+    return rid.toString();
   }
 
   _self(rid: string) {

@@ -3,6 +3,7 @@ import Collection from "./collection";
 import ItemObject from "./item-object";
 import Items from "./items";
 import PartitionKeyRange from "./partition-key-range";
+import ResourceId from "./resource-id";
 
 export default class PartitionKeyRanges extends Items<
   Collection,
@@ -10,6 +11,13 @@ export default class PartitionKeyRanges extends Items<
 > {
   _newItem(data: ItemObject | undefined | null) {
     return new PartitionKeyRange(data);
+  }
+
+  _rid(id: string) {
+    const collection = this._parent.read();
+    const rid = ResourceId.parse(collection._rid);
+    rid.partitionKeyRange = id;
+    return rid.toString();
   }
 
   _self(rid: string) {

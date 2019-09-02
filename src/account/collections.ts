@@ -3,6 +3,7 @@ import Collection from "./collection";
 import Database from "./database";
 import ItemObject from "./item-object";
 import Items from "./items";
+import ResourceId from "./resource-id";
 
 export default class Collections extends Items<Database, Collection> {
   _set(data: ItemObject) {
@@ -21,6 +22,11 @@ export default class Collections extends Items<Database, Collection> {
 
   _newItem(data: ItemObject | undefined | null) {
     return new Collection(data);
+  }
+
+  _rid(id: string) {
+    const database = this._parent.read();
+    return ResourceId.newDocumentCollectionId(database._rid, id).toString();
   }
 
   _self(rid: string) {
