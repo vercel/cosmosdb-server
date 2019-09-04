@@ -1,0 +1,23 @@
+on: push
+name: Build, Test, and Publish
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['10.x', '12.x']
+    steps:
+    - uses: actions/checkout@master
+    - run: git submodule update --init --recursive
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node }}
+    - run: npm install
+      env:
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+    - run: npm run lint
+    - run: npm test
+    - if: matrix.node == '12.x' && startsWith(github.ref, 'refs/tags/')
+      run: npm publish --access public --unsafe-perm
+      env:
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
