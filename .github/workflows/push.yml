@@ -1,0 +1,36 @@
+on: push
+name: Build, Test, and Publish
+jobs:
+  submodule:
+    name: Submodule
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Submodule
+      uses: docker://alpine/git:latest
+      with:
+        args: submodule update --init --recursive
+    - name: Build
+      uses: actions/npm@master
+      env:
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      with:
+        args: install
+    - name: Lint
+      uses: actions/npm@master
+      with:
+        args: run lint
+    - name: Test
+      uses: actions/npm@master
+      with:
+        args: test
+    - name: Tag
+      uses: actions/bin/filter@master
+      with:
+        args: tag
+    - name: Publish
+      uses: actions/npm@master
+      env:
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      with:
+        args: publish --access public --unsafe-perm
