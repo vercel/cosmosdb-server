@@ -1,36 +1,23 @@
 on: push
 name: Build, Test, and Publish
 jobs:
-  submodule:
-    name: Submodule
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['10.x', '12.x']
     steps:
     - uses: actions/checkout@master
-    - name: Submodule
-      uses: docker://alpine/git:latest
+    - run: git submodule update --init --recursive
+    - uses: actions/setup-node@v1
       with:
-        args: submodule update --init --recursive
-    - name: Build
-      uses: actions/npm@master
+        node-version: ${{ matrix.node }}
+    - run: npm install
       env:
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      with:
-        args: install
-    - name: Lint
-      uses: actions/npm@master
-      with:
-        args: run lint
-    - name: Test
-      uses: actions/npm@master
-      with:
-        args: test
-    - name: Tag
-      uses: actions/bin/filter@master
-      with:
-        args: tag
-    - name: Publish
-      uses: actions/npm@master
+    - run: npm run lint
+    - run: npm test
+    - if: matrix.node == '12.x' && startsWith(github.ref, 'refs/tags/')
+      run: npm publish --access public --unsafe-perm
       env:
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      with:
-        args: publish --access public --unsafe-perm
