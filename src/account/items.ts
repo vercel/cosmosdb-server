@@ -1,10 +1,9 @@
 /* eslint-disable class-methods-use-this, no-underscore-dangle, no-use-before-define */
 import query from "@zeit/cosmosdb-query";
-import base64Lex from "base64-lex";
-import { randomBytes } from "crypto";
 import uuid from "uuid/v1";
 import ItemObject from "./item-object";
 import Item from "./item";
+import ResourceId from "./resource-id";
 
 function ts() {
   return Math.floor(Date.now() / 1e3);
@@ -17,15 +16,12 @@ export default class Items<P extends Item, I extends Item> {
 
   _index: Map<string, string>;
 
-  _ridPrefix: string;
-
   _ridCount: number;
 
   constructor(parent: P) {
     this._parent = parent;
     this._data = new Map();
     this._index = new Map();
-    this._ridPrefix = base64Lex.encode(randomBytes(4));
     this._ridCount = 0;
   }
 
@@ -39,7 +35,8 @@ export default class Items<P extends Item, I extends Item> {
       throw err;
     }
 
-    const _rid = this._rid();
+    this._ridCount += 1;
+    const _rid = this._rid(this._ridCount.toString());
     const _data = {
       ...data,
       id: data.id,
@@ -142,12 +139,8 @@ export default class Items<P extends Item, I extends Item> {
     throw new Error("Not implemented");
   }
 
-  _rid() {
-    const rid =
-      this._ridPrefix +
-      base64Lex.encode(String(this._ridCount).padStart(10, "0"));
-    this._ridCount += 1;
-    return rid;
+  _rid(id: string): string {
+    throw new Error("Not implemented");
   }
 
   // eslint-disable-next-line no-unused-vars
