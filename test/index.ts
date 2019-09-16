@@ -97,3 +97,9 @@ export const udf = withTestEnv(async client => {
     .fetchAll();
   assert.deepStrictEqual(resources, [true]);
 });
+
+export const deleteDatabase = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "test-database" });
+  const result = await database.delete();
+  assert.strictEqual(result.statusCode, 204);
+});
