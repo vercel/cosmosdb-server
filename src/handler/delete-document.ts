@@ -21,5 +21,6 @@ export default (
     return {};
   }
 
+  res.statusCode = 204;
   return collection.documents.delete(docId);
 };
