@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this, no-underscore-dangle, no-use-before-define */
 import query from "@zeit/cosmosdb-query";
-import uuid from "uuid/v1";
+import uuid from "uuid/v4";
 import ItemObject from "./item-object";
 import Item from "./item";
 import ResourceId from "./resource-id";

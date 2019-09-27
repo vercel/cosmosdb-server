@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import { createServer } from "https";
 import { join } from "path";
 import * as tls from "tls";
+import uuid from "uuid/v4";
 import Account from "./account";
 import routes from "./routes";
 
@@ -41,7 +42,14 @@ export default () => {
         `https://${req.headers.host}${req.url}`
       );
       res.setHeader("connection", "close");
+      res.setHeader("x-ms-activity-id", uuid());
       res.setHeader("x-ms-request-charge", "1");
+      if (req.headers["x-ms-documentdb-populatequerymetrics"]) {
+        res.setHeader(
+          "x-ms-documentdb-query-metrics",
+          "totalExecutionTimeInMs=0.00;queryCompileTimeInMs=0.00;queryLogicalPlanBuildTimeInMs=0.00;queryPhysicalPlanBuildTimeInMs=0.00;queryOptimizationTimeInMs=0.00;VMExecutionTimeInMs=0.00;indexLookupTimeInMs=0.00;documentLoadTimeInMs=0.00;systemFunctionExecuteTimeInMs=0.00;userFunctionExecuteTimeInMs=0.00;retrievedDocumentCount=0;retrievedDocumentSize=0;outputDocumentCount=1;outputDocumentSize=0;writeOutputTimeInMs=0.00;indexUtilizationRatio=0.00"
+        );
+      }
       res.end(JSON.stringify(body));
     })().catch(err => {
       // eslint-disable-next-line no-console
