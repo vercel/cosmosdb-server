@@ -15,4 +15,4 @@ npm run build:test -- --force
 mv src/tsconfig.json{.bak,}
 
 ACCOUNT_HOST="https://localhost:$port" npm run integration-test:node -- --i --exit \
-  -g 'Authorization|database account|http proxy|Change Feed|Cross Partition|indexing|Offer CRUD|Parallel Query As String|Permission|Query Metrics On Single Partition Collection|ResourceLink Trimming|Session Token|spatial|sproc|stored procedure|Trigger|trigger|TTL|User|Non Partitioned'
+  -g 'Authorization|database account|http proxy|Change Feed|Cross Partition|indexing|Offer CRUD|Parallel Query As String|Permission|Query Metrics On Single Partition Collection|ResourceLink Trimming|Session Token|spatial|sproc|stored procedure|Trigger|trigger|TTL|User|Non Partitioned|Validate SSL verification|matching constant version & package version'
