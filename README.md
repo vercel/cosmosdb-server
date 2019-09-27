@@ -52,3 +52,5 @@ It exposes the `cosmosdb-server` cli command as well.
 - Item operations.
 - User-defined function operations.
 - Any SQL queries except spatial functions
+
+It may not support newly added features yet. Please report on the Github issue if you find one.
