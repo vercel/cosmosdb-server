@@ -26,6 +26,7 @@ export default async (
     return {};
   }
 
+  res.statusCode = 201;
   try {
     return collection.documents.create(body);
   } catch (err) {

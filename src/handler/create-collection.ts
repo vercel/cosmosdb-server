@@ -34,5 +34,6 @@ export default async (
     return { Message: "conflict" };
   }
 
+  res.statusCode = 201;
   return database.collections.create(body);
 };

@@ -31,6 +31,7 @@ export default async (
     return {};
   }
 
+  res.statusCode = 201;
   try {
     return collection.userDefinedFunctions.create(body);
   } catch (err) {

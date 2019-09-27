@@ -18,5 +18,6 @@ export default async (
     return { Message: "conflict" };
   }
 
+  res.statusCode = 201;
   return account.databases.create(body);
 };
