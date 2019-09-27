@@ -1,4 +1,4 @@
 lib
 node_modules
-test/azure-cosmos-js
+test/azure-sdk-for-js
 *.log

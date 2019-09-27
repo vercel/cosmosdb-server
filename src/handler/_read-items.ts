@@ -1,3 +1,4 @@
+import { SyntaxError } from "@zeit/cosmosdb-query";
 import * as http from "http";
 
 const parseJSONOrNull = (s: string) => {
@@ -30,7 +31,19 @@ export default async (
   }) => Promise<any> | any
 ) => {
   const { maxItemCount, continuation } = parseHeaders(req.headers);
-  const result = await fn({ maxItemCount, continuation });
+  let result;
+  try {
+    result = await fn({ maxItemCount, continuation });
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      res.statusCode = 400;
+      return {
+        code: "BadRequest",
+        message: err.message
+      };
+    }
+    throw err;
+  }
   if (!result) {
     res.statusCode = 404;
     return {};

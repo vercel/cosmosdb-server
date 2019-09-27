@@ -103,3 +103,16 @@ export const deleteDatabase = withTestEnv(async client => {
   const result = await database.delete();
   assert.strictEqual(result.statusCode, 204);
 });
+
+export const querySyntaxError = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "test-database" });
+  const { container } = await database.containers.create({
+    id: "test-container"
+  });
+  try {
+    await container.items.query("INVALID SELECT *").fetchAll();
+    assert.fail();
+  } catch (err) {
+    assert.strictEqual(err.code, 400);
+  }
+});
