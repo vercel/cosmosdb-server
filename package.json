@@ -26,7 +26,7 @@
     "test-sdk": "./test/sdk.sh"
   },
   "dependencies": {
-    "@zeit/cosmosdb-query": "0.5.0",
+    "@zeit/cosmosdb-query": "0.5.2",
     "path-to-regexp": "3.1.0",
     "big-integer": "1.6.46",
     "int64-buffer": "0.99.1007",
