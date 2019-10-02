@@ -26,32 +26,32 @@
     "test-sdk": "./test/sdk.sh"
   },
   "dependencies": {
-    "@zeit/cosmosdb-query": "0.4.0",
+    "@zeit/cosmosdb-query": "0.5.0",
     "path-to-regexp": "3.1.0",
-    "big-integer": "1.6.44",
+    "big-integer": "1.6.46",
     "int64-buffer": "0.99.1007",
     "path-to-regexp": "3.1.0",
     "raw-body": "2.4.1",
     "uuid": "3.3.3"
   },
   "devDependencies": {
-    "@azure/cosmos": "3.3.0",
-    "@babel/core": "7.5.5",
-    "@types/node": "12.7.4",
+    "@azure/cosmos": "3.3.1",
+    "@babel/core": "7.6.2",
+    "@types/node": "12.7.9",
     "@types/uuid": "3.4.5",
-    "@typescript-eslint/eslint-plugin": "2.1.0",
-    "@typescript-eslint/parser": "2.1.0",
+    "@typescript-eslint/eslint-plugin": "2.3.2",
+    "@typescript-eslint/parser": "2.3.2",
     "@zeit/best": "0.5.3",
     "@zeit/git-hooks": "0.1.4",
-    "eslint": "6.3.0",
+    "eslint": "6.5.1",
     "eslint-config-airbnb": "18.0.1",
-    "eslint-config-prettier": "6.2.0",
+    "eslint-config-prettier": "6.3.0",
     "eslint-plugin-import": "2.18.2",
     "eslint-plugin-jsx-a11y": "6.2.3",
-    "eslint-plugin-react": "7.14.3",
+    "eslint-plugin-react": "7.15.1",
     "prettier": "1.18.2",
-    "ts-node": "8.3.0",
-    "typescript": "3.6.2"
+    "ts-node": "8.4.1",
+    "typescript": "3.6.3"
   },
   "eslintConfig": {
     "extends": [
