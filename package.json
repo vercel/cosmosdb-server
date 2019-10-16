@@ -30,7 +30,6 @@
     "path-to-regexp": "3.1.0",
     "big-integer": "1.6.46",
     "int64-buffer": "0.99.1007",
-    "path-to-regexp": "3.1.0",
     "raw-body": "2.4.1",
     "uuid": "3.3.3"
   },
