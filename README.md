@@ -23,12 +23,8 @@ async function runClient() {
   });
 
   // initialize databases since the server is always empty when it boots
-  const { database } = await client.databases.createIfNotExists({
-    id: "test-db"
-  });
-  const { container } = await database.containers.createIfNotExists({
-    id: "test-container"
-  });
+  const { database } = await client.databases.createIfNotExists({ id: 'test-db' });
+  const { container } = await database.containers.createIfNotExists({ id: 'test-container' });
 
   // use the client
   // ...
