@@ -3,12 +3,9 @@
 A Cosmos DB server implementation for testing your apps locally.
 
 ```js
-const { default: cosmosServer } = require('@zeit/cosmosdb-server');
-const { CosmosClient } = require('@azure/cosmos');
-
-// disable SSL verification
-// since the server uses self-signed certificate
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+const { default: cosmosServer } = require("@zeit/cosmosdb-server");
+const { CosmosClient } = require("@azure/cosmos");
+const https = require("https");
 
 cosmosServer().listen(3000, () => {
   console.log(`Cosmos DB server running at https://localhost:3000`);
@@ -19,7 +16,10 @@ cosmosServer().listen(3000, () => {
 async function runClient() {
   const client = new CosmosClient({
     endpoint: `https://localhost:3000`,
-    key: "dummy key"
+    key: "dummy key",
+    // disable SSL verification
+    // since the server uses self-signed certificate
+    agent: https.Agent({ rejectUnauthorized: false })
   });
 
   // initialize databases since the server is always empty when it boots
@@ -28,7 +28,7 @@ async function runClient() {
 
   // use the client
   // ...
-});
+}
 ```
 
 To run the server on cli:
