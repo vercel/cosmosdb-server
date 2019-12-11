@@ -18,6 +18,8 @@ export default async (
   readItems(
     req,
     res,
+    collId,
+    account.database(dbId).collection(collId)._data._etag,
     "UserDefinedFunctions",
     async ({ continuation, maxItemCount }) => {
       const body = await json(req);

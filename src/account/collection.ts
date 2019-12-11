@@ -20,13 +20,14 @@ export default class Collection extends Item {
 
     if (data) {
       this.partitionKeyRanges.create({
-        id: 0,
+        id: "0",
         minInclusive: "",
-        maxInclusive: "FF",
+        maxExclusive: "FF",
         ridPrefix: 0,
         throughputFraction: 1,
         status: "online",
-        parents: []
+        parents: [],
+        metadata: {}
       });
     }
   }

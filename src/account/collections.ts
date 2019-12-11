@@ -34,6 +34,6 @@ export default class Collections extends Items<Database, Collection> {
     if (!parent) {
       throw new Error("parent is missing");
     }
-    return `${parent._self}/colls/${rid}`;
+    return `${parent._self}colls/${rid}/`;
   }
 }

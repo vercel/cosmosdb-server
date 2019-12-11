@@ -3,7 +3,7 @@ import * as net from "net";
 import cosmosDBServer from ".";
 
 const argv = process.argv.slice(2);
-const args: { help?: boolean; port?: number } = {};
+const args: { help?: boolean; port?: number, secure: boolean } = { secure: true };
 while (argv.length) {
   const key = argv.shift();
   switch (key) {
@@ -14,6 +14,10 @@ while (argv.length) {
     case "-p":
     case "--port":
       args.port = parseInt(argv.shift(), 10);
+      break;
+    case "-i":
+    case "--insecure":
+      args.secure = false;
       break;
     default:
       break;
@@ -29,16 +33,17 @@ Options:
 
   -h, --help
   -p, --port
+  -i, --insecure : http instead of the default https
 `);
   process.exit();
 }
 
-const server = cosmosDBServer().listen(args.port, () => {
+const server = cosmosDBServer(args.secure).listen(args.port, () => {
   const { address, family, port } = server.address() as net.AddressInfo;
   // eslint-disable-next-line no-console
   console.log(
-    `Ready to accept connections at ${
+    `Ready to accept connections at ${args.secure ? 'https' : 'http'}://${
       family === "IPv6" ? `[${address}]` : address
-    }:${port}`
+    }:${port}/`
   );
 });

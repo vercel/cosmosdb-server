@@ -1,5 +1,6 @@
 import { SyntaxError } from "@zeit/cosmosdb-query";
 import * as http from "http";
+import { SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS } from "constants";
 
 const parseJSONOrNull = (s: string) => {
   try {
@@ -22,6 +23,8 @@ const parseHeaders = (headers: { [x: string]: any }) => {
 export default async (
   req: http.IncomingMessage,
   res: http.ServerResponse,
+  _rid: string,
+  _etag: string,
   itemsName: string,
   fn: (arg: {
     maxItemCount?: number | null;
@@ -59,5 +62,5 @@ export default async (
   }
   res.setHeader("x-ms-item-count", String(count));
 
-  return { [itemsName]: result.result, _count: count };
+  return { _rid: _rid, _etag: _etag, [itemsName]: result.result, _count: count };
 };

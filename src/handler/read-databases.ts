@@ -7,6 +7,6 @@ export default (
   req: http.IncomingMessage,
   res: http.ServerResponse
 ) =>
-  readItems(req, res, "Databases", async ({ continuation, maxItemCount }) =>
+  readItems(req, res, "", account._data._etag, "Databases", async ({ continuation, maxItemCount }) =>
     account.databases.read({ continuation, maxItemCount })
   );

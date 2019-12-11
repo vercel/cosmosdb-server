@@ -14,7 +14,7 @@ export default (
     collId: string;
   }
 ) =>
-  readItems(req, res, "Documents", async ({ continuation, maxItemCount }) =>
+  readItems(req, res, collId, account.database(dbId).collection(collId)._data._etag, "Documents", async ({ continuation, maxItemCount }) =>
     account
       .database(dbId)
       .collection(collId)

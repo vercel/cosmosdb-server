@@ -16,7 +16,7 @@ export default async (
     collId: string;
   }
 ) =>
-  readItems(req, res, "Documents", async ({ continuation, maxItemCount }) => {
+  readItems(req, res, collId, account.database(dbId).collection(collId)._data._etag, "Documents", async ({ continuation, maxItemCount }) => {
     const body = await json(req);
     if (!body.query) {
       res.statusCode = 400;

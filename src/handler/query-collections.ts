@@ -16,6 +16,8 @@ export default async (
   readItems(
     req,
     res,
+    dbId,
+    account.database(dbId)._data._etag,
     "DocumentCollections",
     async ({ continuation, maxItemCount }) => {
       const body = await json(req);

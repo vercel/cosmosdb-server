@@ -4,6 +4,7 @@ import Item from "./item";
 
 export default class Account extends Item {
   databases: Databases;
+  sequence: number = 0;
 
   constructor() {
     super({

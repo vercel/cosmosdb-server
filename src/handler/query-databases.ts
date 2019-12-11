@@ -8,7 +8,7 @@ export default async (
   req: http.IncomingMessage,
   res: http.ServerResponse
 ) =>
-  readItems(req, res, "Databases", async ({ continuation, maxItemCount }) => {
+  readItems(req, res, "", account._data._etag, "Databases", async ({ continuation, maxItemCount }) => {
     const body = await json(req);
     return account.databases.query(body, { continuation, maxItemCount });
   });

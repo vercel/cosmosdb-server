@@ -40,7 +40,7 @@ export default class Items<P extends Item, I extends Item> {
     const _data = {
       ...data,
       id: data.id,
-      _etag: uuid(),
+      _etag: `\"${uuid()}\"`,
       _rid,
       _self: this._self(_rid),
       _ts: ts()

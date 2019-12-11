@@ -2,3 +2,4 @@ lib
 node_modules
 test/azure-sdk-for-js
 *.log
+package-lock.json

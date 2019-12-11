@@ -26,6 +26,6 @@ export default class PartitionKeyRanges extends Items<
       throw new Error("parent is missing");
     }
 
-    return `${parent._self}/pkranges/${rid}`;
+    return `${parent._self}pkranges/${rid}/`;
   }
 }

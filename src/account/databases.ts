@@ -16,6 +16,6 @@ export default class Databases extends Items<Account, Database> {
   }
 
   _self(rid: string) {
-    return `/dbs/${rid}`;
+    return `dbs/${rid}/`;
   }
 }

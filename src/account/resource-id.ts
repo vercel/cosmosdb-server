@@ -3,8 +3,7 @@
 // https://github.com/Azure/azure-cosmosdb-java/blob/v2.6.0/commons/src/main/java/com/microsoft/azure/cosmosdb/internal/ResourceId.java
 
 /* eslint-disable no-bitwise, no-plusplus */
-import BigInt from "big-integer";
-import { Int64BE } from "int64-buffer";
+import { Uint64LE } from "int64-buffer";
 
 export const EMPTY = "0"; // TODO: This is kinda hacky
 
@@ -159,43 +158,40 @@ export default class ResourceId {
 
     // first 4 bytes represent the database
     if (buffer.length >= 4) {
-      rid.database = buffer.readIntBE(0, 4).toString();
+      rid.database = buffer.readUIntLE(0, 4).toString();
     }
 
     if (buffer.length >= 8) {
-      const isCollection = (intArray[4] & 128) > 0;
+      const isCollection = (intArray[4] & 0x80) != 0;
 
       if (isCollection) {
         // 5th - 8th bytes represents the collection
 
-        rid.documentCollection = buffer.readIntBE(4, 4).toString();
+        rid.documentCollection = buffer.readUIntLE(4, 4).toString();
 
         if (buffer.length >= 16) {
           // 9th - 15th bytes represent one of document, trigger, sproc, udf, conflict, pkrange
-          const subCollectionResource = ResourceId.bigNumberReadIntBE(
-            buffer,
-            8,
-            8
-          ).toString();
+          const subCollectionResourceLower = buffer.readUIntLE(8, 4);
+          const subCollectionResourceUpper = buffer.readUIntLE(12, 4);
+          const subCollectionResource = new Uint64LE(subCollectionResourceUpper & 0x00FFFFFF, subCollectionResourceLower).toString();
 
-          if (intArray[15] >> 4 === ResourceId.DocumentByte) {
+          const type = (intArray[15] >> 4) & 0x0F;
+          if (type === ResourceId.DocumentByte) {
             rid.document = subCollectionResource;
 
             // 16th - 20th bytes represent the attachment
             if (buffer.length === 20) {
-              rid.attachment = buffer.readIntBE(16, 4).toString();
+              rid.attachment = buffer.readUIntLE(16, 4).toString();
             }
-          } else if (
-            Math.abs(intArray[15] >> 4) === ResourceId.StoredProcedureByte
-          ) {
+          } else if (type === ResourceId.StoredProcedureByte) {
             rid.storedProcedure = subCollectionResource;
-          } else if (intArray[15] >> 4 === ResourceId.TriggerByte) {
+          } else if (type === ResourceId.TriggerByte) {
             rid.trigger = subCollectionResource;
-          } else if (intArray[15] >> 4 === ResourceId.UserDefinedFunctionByte) {
+          } else if (type === ResourceId.UserDefinedFunctionByte) {
             rid.userDefinedFunction = subCollectionResource;
-          } else if (intArray[15] >> 4 === ResourceId.ConflictByte) {
+          } else if (type === ResourceId.ConflictByte) {
             rid.conflict = subCollectionResource;
-          } else if (intArray[15] >> 4 === ResourceId.PartitionKeyRangeByte) {
+          } else if (type === ResourceId.PartitionKeyRangeByte) {
             rid.partitionKeyRange = subCollectionResource;
           } else {
             return [false, rid];
@@ -206,15 +202,14 @@ export default class ResourceId {
       } else {
         // 5th - 8th bytes represents the user
 
-        rid.user = buffer.readIntBE(4, 4).toString();
+        const rawUser = buffer.readUIntLE(4, 4);
+        rid.user = (((rawUser & 0xFFFFFF00) >> 1) | (rawUser & 0x0000007F)).toString();
 
         // 9th - 15th bytes represent the permission
         if (buffer.length === 16) {
-          rid.permission = ResourceId.bigNumberReadIntBE(
-            buffer,
-            8,
-            8
-          ).toString();
+          const upper = buffer.readUIntLE(8, 4);
+          const lower = buffer.readUIntLE(12, 4);
+          rid.permission = new Uint64LE(upper, lower).toString();
         } else if (buffer.length !== 8) {
           return [false, rid];
         }
@@ -250,35 +245,6 @@ export default class ResourceId {
     return buffer.toString("base64");
   }
 
-  public static bigNumberReadIntBE(
-    buffer: Buffer,
-    offset: number,
-    byteLength: number
-  ) {
-    // eslint-disable-next-line no-param-reassign
-    offset >>>= 0;
-
-    // eslint-disable-next-line no-param-reassign
-    byteLength >>>= 0;
-
-    let i = byteLength;
-    let mul = BigInt("1");
-    let val = BigInt(buffer[offset + --i]);
-    while (i > 0 && mul) {
-      const temp = BigInt(buffer[offset + --i]);
-      mul = mul.times(0x100);
-      val = val.plus(temp.times(mul));
-    }
-    mul = mul.times(0x80);
-
-    if (val.greater(mul)) {
-      const subtrahend = BigInt(2);
-      val = val.minus(subtrahend.pow(8 * byteLength));
-    }
-
-    return val;
-  }
-
   public isDatabaseId() {
     return (
       this.database !== EMPTY &&
@@ -299,6 +265,7 @@ export default class ResourceId {
     return rid;
   }
 
+  /*
   public getUniqueDocumentCollectionId() {
     const db = BigInt(this.database);
     const coll = BigInt(this.documentCollection);
@@ -307,7 +274,7 @@ export default class ResourceId {
       .or(coll)
       .toString();
   }
-
+*/
   public getStoredProcedureId() {
     const rid = new ResourceId();
     rid.database = this.database;
@@ -415,43 +382,56 @@ export default class ResourceId {
     buffer.fill(0);
 
     if (this.offer !== EMPTY) {
-      buffer.writeIntLE(Number(this.offer), 0, ResourceId.OfferIdLength);
+      buffer.writeUIntLE(Number(this.offer), 0, ResourceId.OfferIdLength);
     } else if (this.database !== EMPTY) {
-      buffer.writeIntBE(Number(this.database), 0, 4);
+      buffer.writeUIntLE(Number(this.database), 0, 4);
     }
 
     if (this.documentCollection !== EMPTY) {
-      buffer.writeIntBE(Number(this.documentCollection), 4, 4);
-    } else if (this.user !== EMPTY) {
-      buffer.writeIntBE(Number(this.user), 4, 4);
-    }
+      const rawCollection = Number(this.documentCollection);
+      buffer.writeUIntLE(((rawCollection & 0x7FFFFF80) << 1) | 0x80 | (rawCollection & 0x0000007F), 4, 4);
 
-    let big: Int64BE;
-    if (this.storedProcedure !== EMPTY) {
-      big = new Int64BE(this.storedProcedure);
-      big.toBuffer().copy(buffer, 8, 0, 8);
-    } else if (this.trigger !== EMPTY) {
-      big = new Int64BE(this.trigger);
-      big.toBuffer().copy(buffer, 8, 0, 8);
-    } else if (this.userDefinedFunction !== EMPTY) {
-      big = new Int64BE(this.userDefinedFunction);
-      big.toBuffer().copy(buffer, 8, 0, 8);
-    } else if (this.conflict !== EMPTY) {
-      big = new Int64BE(this.conflict);
-      big.toBuffer().copy(buffer, 8, 0, 8);
-    } else if (this.document !== EMPTY) {
-      big = new Int64BE(this.document);
-      big.toBuffer().copy(buffer, 8, 0, 8);
-    } else if (this.permission !== EMPTY) {
-      big = new Int64BE(this.permission);
-      big.toBuffer().copy(buffer, 8, 0, 8);
-    } else if (this.partitionKeyRange !== EMPTY) {
-      big = new Int64BE(this.partitionKeyRange);
-      big.toBuffer().copy(buffer, 8, 0, 8);
-    }
+      let value: string;
+      let type: number;
+      if (this.storedProcedure !== EMPTY) {
+        value = this.storedProcedure;
+        type = ResourceId.StoredProcedureByte;
+      }
+      else if (this.trigger !== EMPTY) {
+        value = this.trigger;
+        type = ResourceId.TriggerByte;
+      }
+      else if (this.userDefinedFunction !== EMPTY) {
+        value = this.userDefinedFunction;
+        type = ResourceId.UserDefinedFunctionByte;
+      }
+      else if (this.conflict !== EMPTY) {
+        value = this.conflict;
+        type = ResourceId.ConflictByte;
+      }
+      else if (this.document !== EMPTY) {
+        value = this.document;
+        type = ResourceId.DocumentByte;
+      }
+      else if (this.partitionKeyRange !== EMPTY) {
+        value = this.partitionKeyRange;
+        type = ResourceId.PartitionKeyRangeByte;
+      }
 
-    if (this.attachment !== EMPTY) {
-      buffer.writeIntBE(Number(this.attachment), 16, 4);
+      if (value && type) {
+        new Uint64LE(value).toBuffer().copy(buffer, 8, 0, 7);
+        buffer[15] = type << 4;
+      }
+
+      if (this.attachment !== EMPTY)
+        buffer.writeUIntLE(Number(this.attachment), 16, 4);
+    }
+    else if (this.user !== EMPTY) {
+      const rawUser = Number(this.user);
+      buffer.writeUIntLE(((rawUser & 0x7FFFFF80) << 1) | 0x00 | (rawUser & 0x0000007F), 4, 4);
+
+      if (this.permission !== EMPTY)
+        new Uint64LE(this.permission).toBuffer().copy(buffer, 8, 0, 8);
     }
 
     return buffer;

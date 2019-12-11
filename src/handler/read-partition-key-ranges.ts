@@ -17,6 +17,8 @@ export default (
   readItems(
     req,
     res,
+    collId,
+    account.database(dbId).collection(collId)._data._etag,
     "PartitionKeyRanges",
     async ({ continuation, maxItemCount }) =>
       account

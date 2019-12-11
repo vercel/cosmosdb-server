@@ -15,6 +15,8 @@ export default (
   readItems(
     req,
     res,
+    dbId,
+    account.database(dbId)._data._etag,
     "DocumentCollections",
     async ({ continuation, maxItemCount }) =>
       account.database(dbId).collections.read({ continuation, maxItemCount })
