@@ -31,7 +31,19 @@ export default async (
 
   if (data.id !== body.id) {
     res.statusCode = 400;
-    return { Message: "replacing id is not allowed" };
+    return {
+      code: "BadRequest",
+      message: "replacing id is not allowed"
+    };
+  }
+
+  if (req.headers["if-match"] && req.headers["if-match"] !== data._etag) {
+    res.statusCode = 412;
+    return {
+      code: "PreconditionFailed",
+      message:
+        "There is already an operation in progress which requires exlusive lock on this service"
+    };
   }
 
   return collection.documents.replace(body);
