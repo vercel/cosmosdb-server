@@ -26,5 +26,17 @@ export default async (
     return {};
   }
 
+  if (req.headers["if-match"]) {
+    const data = collection.document(body.id).read();
+    if (data && req.headers["if-match"] !== data._etag) {
+      res.statusCode = 412;
+      return {
+        code: "PreconditionFailed",
+        message:
+          "Operation cannot be performed because one of the specified precondition is not met."
+      };
+    }
+  }
+
   return collection.documents.upsert(body);
 };
