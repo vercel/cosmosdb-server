@@ -42,7 +42,7 @@ export default async (
     return {
       code: "PreconditionFailed",
       message:
-        "There is already an operation in progress which requires exlusive lock on this service"
+        "Operation cannot be performed because one of the specified precondition is not met."
     };
   }
 
