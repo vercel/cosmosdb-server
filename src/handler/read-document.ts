@@ -26,7 +26,6 @@ export default (
     .collection(collId)
     .read();
 
-  // We need to check the collection config so if it's not there it's 404
   if (!collection) {
     res.statusCode = 404;
     return {
@@ -35,18 +34,21 @@ export default (
     };
   }
 
-  // We get the paths for the partitionKeys
+  // Get partition key paths defined in the collection
   const paths = collection.partitionKey.paths
     .map(path => path.slice(1))
     .filter(path => path !== "_partitionKey");
 
-  // Get the partition keys coming from the header
-  const partitionKeys = JSON.parse((req.headers[
-    "x-ms-documentdb-partitionkey"
-  ] || "[]") as string);
+  // Get partition keys given by the client
+  const partitionkeyHeader =
+    req.headers["x-ms-documentdb-partitionkey"] || "[{}]";
+  const partitionkeys: string[] =
+    partitionkeyHeader !== "[{}]"
+      ? JSON.parse(partitionkeyHeader as string)
+      : [];
 
-  // If there is a mismatch between provided partition keys and collection 400
-  if (paths.length !== partitionKeys.length) {
+  // If there is a mismatch between client and server keys it is a 400
+  if (paths.length > partitionkeys.length) {
     res.statusCode = 400;
     return {
       code: "BadRequest",
@@ -59,7 +61,7 @@ export default (
   if (
     !data ||
     paths.some(
-      (path, idx) => (data as { [k: string]: any })[path] !== partitionKeys[idx]
+      (path, idx) => data[path as keyof typeof data] !== partitionkeys[idx]
     )
   ) {
     res.statusCode = 404;
