@@ -1,5 +1,36 @@
 import * as http from "http";
 import Account from "../account";
+import ItemObject from "../account/item-object";
+
+/**
+ * Given a collection configuration this filters out _partitionKey which
+ * is legacy and parses each partitionKey into a key of the collection
+ * data.
+ */
+function getCollectionPartitionKeys(collection: ItemObject) {
+  return collection.partitionKey.paths
+    .map(path => path.slice(1))
+    .filter(path => path !== "_partitionKey");
+}
+
+/**
+ * Given some headers it will parse the provided partition keys into
+ * an array of paths. It ignores array of empty object as it is what
+ * the client provides when no partition key is given.
+ */
+function getClientPartitionKeys(headers: http.IncomingHttpHeaders) {
+  const key = headers["x-ms-documentdb-partitionkey"] as string;
+
+  if (!key || key === "[{}]") {
+    return [];
+  }
+
+  try {
+    return JSON.parse(key);
+  } catch (error) {
+    return [];
+  }
+}
 
 export default (
   account: Account,
@@ -21,12 +52,7 @@ export default (
     .document(docId)
     .read();
 
-  const collection = account
-    .database(dbId)
-    .collection(collId)
-    .read();
-
-  if (!collection) {
+  if (!data) {
     res.statusCode = 404;
     return {
       code: "NotFound",
@@ -34,41 +60,42 @@ export default (
     };
   }
 
-  // Get partition key paths defined in the collection
-  const paths = collection.partitionKey.paths
-    .map(path => path.slice(1))
-    .filter(path => path !== "_partitionKey");
+  if (req.headers["x-ms-documentdb-query-enablecrosspartition"] !== "true") {
+    const collection = account
+      .database(dbId)
+      .collection(collId)
+      .read();
 
-  // Get partition keys given by the client
-  const partitionkeyHeader =
-    req.headers["x-ms-documentdb-partitionkey"] || "[{}]";
-  const partitionkeys: string[] =
-    partitionkeyHeader !== "[{}]"
-      ? JSON.parse(partitionkeyHeader as string)
-      : [];
+    if (!collection) {
+      res.statusCode = 404;
+      return {
+        code: "NotFound",
+        message: "Entity with the specified id does not exist in the system.,"
+      };
+    }
 
-  // If there is a mismatch between client and server keys it is a 400
-  if (paths.length > partitionkeys.length) {
-    res.statusCode = 400;
-    return {
-      code: "BadRequest",
-      message:
-        "The partition key supplied in x-ms-partitionkey header has fewer components than defined in the collection"
-    };
-  }
+    const collectionKeys = getCollectionPartitionKeys(collection);
+    const clientKeys = getClientPartitionKeys(req.headers);
 
-  // If the partition keys are not matching the data or there is no data 404
-  if (
-    !data ||
-    paths.some(
-      (path, idx) => data[path as keyof typeof data] !== partitionkeys[idx]
-    )
-  ) {
-    res.statusCode = 404;
-    return {
-      code: "NotFound",
-      message: "Entity with the specified id does not exist in the system.,"
-    };
+    if (collectionKeys.length > clientKeys.length) {
+      res.statusCode = 400;
+      return {
+        code: "BadRequest",
+        message:
+          "The partition key supplied in x-ms-partitionkey header has fewer components than defined in the collection"
+      };
+    }
+
+    for (let i = 0; i <= collectionKeys.length; i += 1) {
+      const path = collectionKeys[i] as keyof typeof data;
+      if (data[path] !== clientKeys[i]) {
+        res.statusCode = 404;
+        return {
+          code: "NotFound",
+          message: "Entity with the specified id does not exist in the system.,"
+        };
+      }
+    }
   }
 
   return data;
