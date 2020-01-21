@@ -16,9 +16,19 @@ export default (
   }
 ) => {
   const collection = account.database(dbId).collection(collId);
-  if (!collection.document(docId).read()) {
+  const data = collection.document(docId).read();
+  if (!data) {
     res.statusCode = 404;
     return {};
+  }
+
+  if (req.headers["if-match"] && req.headers["if-match"] !== data._etag) {
+    res.statusCode = 412;
+    return {
+      code: "PreconditionFailed",
+      message:
+        "Operation cannot be performed because one of the specified precondition is not met."
+    };
   }
 
   res.statusCode = 204;
