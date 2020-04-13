@@ -14,7 +14,7 @@ const options = {
   requestCert: false
 };
 
-export const configure = (opts: typeof options) => Object.assign(options, opts)
+export const configure = (opts: Partial<typeof options>) => Object.assign(options, opts)
 
 export default () => {
   const account = new Account();
