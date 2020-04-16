@@ -14,12 +14,10 @@ const options: ServerOptions = {
   requestCert: false
 };
 
-export const configure = (opts: ServerOptions) => Object.assign(options, opts)
-
-export default () => {
+export default (opts?: ServerOptions) => {
   const account = new Account();
 
-  return createServer(options, (req, res) => {
+  return createServer({...options, ...opts}, (req, res) => {
     const route = routes(req);
 
     (async () => {
