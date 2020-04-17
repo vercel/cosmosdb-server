@@ -1,12 +1,12 @@
 import { readFileSync } from "fs";
-import { createServer } from "https";
+import { createServer, ServerOptions } from "https";
 import { join } from "path";
 import * as tls from "tls";
 import uuid from "uuid/v4";
 import Account from "./account";
 import routes from "./routes";
 
-const options = {
+const options: ServerOptions = {
   cert: readFileSync(join(__dirname, "..", "cert.pem")),
   key: readFileSync(join(__dirname, "..", "key.pem")),
   minVersion: "TLSv1" as tls.SecureVersion,
@@ -14,10 +14,10 @@ const options = {
   requestCert: false
 };
 
-export default () => {
+export default (opts?: ServerOptions) => {
   const account = new Account();
 
-  return createServer(options, (req, res) => {
+  return createServer({...options, ...opts}, (req, res) => {
     const route = routes(req);
 
     (async () => {
