@@ -45,6 +45,14 @@ npm install @zeit/cosmosdb-server
 
 It exposes the `cosmosdb-server` cli command as well.
 
+## API
+
+#### cosmosServer(opts?: https.ServerOptions): https.Server
+
+Create a new instance of cosmos server. You can pass https server options as the argument.
+
+See [`https.createServer`](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener) for more information.
+
 ## Supported operations
 
 - Database operations.
