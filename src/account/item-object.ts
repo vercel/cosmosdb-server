@@ -8,10 +8,10 @@ type ItemObject = {
   partitionKey?: {
     paths: string[];
   };
-  _etag: string;
+  _etag?: string;
   _rid: string;
   _self: string;
-  _ts: number;
+  _ts?: number;
 };
 
 // eslint-disable-next-line no-undef

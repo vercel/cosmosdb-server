@@ -10,13 +10,14 @@ import queryCollections from "./handler/query-collections";
 import queryDatabases from "./handler/query-databases";
 import queryDocuments from "./handler/query-documents";
 import queryUserDefinedFunctions from "./handler/query-user-defined-functions";
+import readAccount from "./handler/read-account";
+import readAddresses from "./handler/read-addresses";
 import readCollection from "./handler/read-collection";
 import readCollections from "./handler/read-collections";
 import readDatabase from "./handler/read-database";
 import readDatabases from "./handler/read-databases";
 import readDocument from "./handler/read-document";
 import readDocuments from "./handler/read-documents";
-import readMeta from "./handler/read-meta";
 import readPartitionKeyRanges from "./handler/read-partition-key-ranges";
 import readUserDefinedFunction from "./handler/read-user-defined-function";
 import readUserDefinedFunctions from "./handler/read-user-defined-functions";
@@ -35,6 +36,7 @@ export default router({
     "/dbs/:dbId": deleteDatabase
   },
   GET: {
+    "/addresses": readAddresses,
     "/dbs/:dbId/colls/:collId/docs/:docId": readDocument,
     "/dbs/:dbId/colls/:collId/docs": readDocuments,
     "/dbs/:dbId/colls/:collId/pkranges": readPartitionKeyRanges,
@@ -44,7 +46,7 @@ export default router({
     "/dbs/:dbId/colls": readCollections,
     "/dbs/:dbId": readDatabase,
     "/dbs": readDatabases,
-    "/": readMeta
+    "/": readAccount
   },
   POST: {
     "/dbs/:dbId/colls/:collId/docs": createDocument,

@@ -45,6 +45,27 @@ npm install @zeit/cosmosdb-server
 
 It exposes the `cosmosdb-server` cli command as well.
 
+### Setup for Java
+
+Add the certificate to the Java CA certificates store like the following:
+
+```sh
+# Example for MacOS. Adjust paths and command according to your environment.
+sudo keytool -keystore "$JAVA_HOME/jre/lib/security/cacerts" -importcert -alias vercel-cosmosdb-server -file node_modules/@zeit/cosmosdb-server/cert.pem
+```
+
+Also ensure to use Gateway mode for the connection policy since this server doesn't support Direct mode:
+
+```java
+import com.azure.cosmos.ConnectionMode;
+import com.azure.cosmos.ConnectionPolicy
+
+...
+
+ConnectionPolicy policy = ConnectionPolicy.getDefaultPolicy();
+policy.setConnectionMode(ConnectionMode.GATEWAY);
+```
+
 ## API
 
 #### cosmosServer(opts?: https.ServerOptions): https.Server
