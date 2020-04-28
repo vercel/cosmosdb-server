@@ -22,7 +22,7 @@ export default class Collection extends Item {
       this.partitionKeyRanges.create({
         id: 0,
         minInclusive: "",
-        maxInclusive: "FF",
+        maxExclusive: "FF",
         ridPrefix: 0,
         throughputFraction: 1,
         status: "online",
