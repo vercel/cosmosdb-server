@@ -1,6 +1,7 @@
 import * as http from "http";
 import { parse } from "url";
 import pathMatch from "./path-match";
+import trueHeader from "./true-header";
 
 export default (rules: { [x: string]: { [y: string]: Function } }) => {
   const routes: { [x: string]: [(p: string) => any, Function][] } = {};
@@ -21,11 +22,11 @@ export default (rules: { [x: string]: { [y: string]: Function } }) => {
 
     let { method } = req;
     if (
-      req.headers["x-ms-documentdb-isquery"] === "true" ||
+      trueHeader(req, "x-ms-documentdb-isquery") ||
       req.headers["content-type"] === "application/query+json"
     ) {
       method += "_QUERY";
-    } else if (req.headers["x-ms-documentdb-is-upsert"] === "true") {
+    } else if (trueHeader(req, "x-ms-documentdb-is-upsert")) {
       method += "_UPSERT";
     }
 
