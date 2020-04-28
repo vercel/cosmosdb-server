@@ -32,8 +32,12 @@ export default (opts?: ServerOptions) => {
           body = { message: err.message };
           res.statusCode = 500;
         }
+        if(res.statusCode > 399 && !body.message) {
+            body.message = '';
+        }
       } else {
         res.statusCode = 400;
+        body = { message: 'no route' }
       }
 
       res.setHeader("content-type", "application/json");
