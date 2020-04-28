@@ -17,12 +17,12 @@ export default async (
   const body = await json(req);
   if (!body.id) {
     res.statusCode = 400;
-    return { Message: "missing id" };
+    return { message: "missing id" };
   }
 
   if (!body.body) {
     res.statusCode = 400;
-    return { Message: "missing body" };
+    return { message: "missing body" };
   }
 
   const collection = account.database(dbId).collection(collId);
@@ -37,7 +37,7 @@ export default async (
   } catch (err) {
     if (err.conflict) {
       res.statusCode = 409;
-      return { Message: err.message };
+      return { message: err.message };
     }
 
     throw err;

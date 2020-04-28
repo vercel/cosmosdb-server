@@ -20,7 +20,7 @@ export default async (
     const body = await json(req);
     if (!body.query) {
       res.statusCode = 400;
-      return { Message: "missing query" };
+      return { message: "missing query" };
     }
 
     const collection = account.database(dbId).collection(collId);
@@ -30,7 +30,7 @@ export default async (
       const paths = (partitionKey || {}).paths || [];
       if (paths.length && !query(body.query).containsPartitionKeys(paths)) {
         res.statusCode = 400;
-        return { Message: "missing partition keys" };
+        return { message: "missing partition keys" };
       }
     }
 
