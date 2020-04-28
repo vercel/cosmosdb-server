@@ -36,7 +36,7 @@ export default class Items<P extends Item, I extends Item> {
     }
 
     this._ridCount += 1;
-    const _rid = this._rid(this._ridCount.toString());
+    const _rid = this._rid(this._ridCount);
     const _data = {
       ...data,
       id: data.id,
@@ -139,7 +139,7 @@ export default class Items<P extends Item, I extends Item> {
     throw new Error("Not implemented");
   }
 
-  _rid(id: string): string {
+  _rid(id: number): string {
     throw new Error("Not implemented");
   }
 
