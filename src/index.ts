@@ -58,6 +58,13 @@ export default (opts?: ServerOptions) => {
           "totalExecutionTimeInMs=0.00;queryCompileTimeInMs=0.00;queryLogicalPlanBuildTimeInMs=0.00;queryPhysicalPlanBuildTimeInMs=0.00;queryOptimizationTimeInMs=0.00;VMExecutionTimeInMs=0.00;indexLookupTimeInMs=0.00;documentLoadTimeInMs=0.00;systemFunctionExecuteTimeInMs=0.00;userFunctionExecuteTimeInMs=0.00;retrievedDocumentCount=0;retrievedDocumentSize=0;outputDocumentCount=1;outputDocumentSize=0;writeOutputTimeInMs=0.00;indexUtilizationRatio=0.00"
         );
       }
+      
+      if (req.headers["a-im"] && res.statusCode === 200) {
+        if (req.headers["if-none-match"]) {
+          res.statusCode = 304;
+        } 
+        res.setHeader("etag", "1");
+      }
       res.end(JSON.stringify(body));
     })().catch(err => {
       // eslint-disable-next-line no-console
