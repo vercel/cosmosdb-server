@@ -40,6 +40,10 @@ export default (opts?: ServerOptions) => {
         body = { message: 'no route' }
       }
 
+      if(body && body._etag) {
+          res.setHeader('etag', body._etag);
+      }
+
       res.setHeader("content-type", "application/json");
       res.setHeader(
         "content-location",
