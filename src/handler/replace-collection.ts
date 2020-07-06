@@ -18,7 +18,7 @@ export default async (
   const body = await json(req);
   if (!body.id) {
     res.statusCode = 400;
-    return { Message: "missing id" };
+    return { message: "missing id" };
   }
 
   const database = account.database(dbId);
@@ -32,7 +32,7 @@ export default async (
     assert.deepStrictEqual(body.partitionKey, data.partitionKey);
   } catch (err) {
     res.statusCode = 400;
-    return { Message: "replacing partitionKey is not allowed" };
+    return { message: "replacing partitionKey is not allowed" };
   }
 
   try {
@@ -40,7 +40,7 @@ export default async (
   } catch (err) {
     if (err.badRequest) {
       res.statusCode = 400;
-      return { Message: err.message };
+      return { message: err.message };
     }
 
     throw err;

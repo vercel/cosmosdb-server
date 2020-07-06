@@ -17,7 +17,7 @@ export default async (
   const body = await json(req);
   if (!body.id) {
     res.statusCode = 400;
-    return { Message: "missing id" };
+    return { message: "missing id" };
   }
 
   const collection = account.database(dbId).collection(collId);

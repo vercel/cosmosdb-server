@@ -13,10 +13,15 @@ export default class PartitionKeyRanges extends Items<
     return new PartitionKeyRange(data);
   }
 
-  _rid(id: string) {
+  _rid(id: number) {
+    const idBuffer = Buffer.alloc(8, 0);
+    idBuffer.writeInt32LE(id, 0);
+    idBuffer.writeInt8(ResourceId.PartitionKeyRangeByte << 4, 7);
+    const idString = ResourceId.bigNumberReadIntBE(idBuffer, 0, 8).toString();
+
     const collection = this._parent.read();
     const rid = ResourceId.parse(collection._rid);
-    rid.partitionKeyRange = id;
+    rid.partitionKeyRange = idString;
     return rid.toString();
   }
 

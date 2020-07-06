@@ -3,6 +3,7 @@ import * as http from "http";
 import readItems from "./_read-items";
 import Account from "../account";
 import json from "../json";
+import trueHeader from "../true-header";
 
 export default async (
   account: Account,
@@ -20,17 +21,17 @@ export default async (
     const body = await json(req);
     if (!body.query) {
       res.statusCode = 400;
-      return { Message: "missing query" };
+      return { message: "missing query" };
     }
 
     const collection = account.database(dbId).collection(collId);
 
-    if (req.headers["x-ms-documentdb-query-enablecrosspartition"] !== "true") {
+    if (!trueHeader(req, "x-ms-documentdb-query-enablecrosspartition")) {
       const { partitionKey }: { partitionKey?: any } = collection.read() || {};
       const paths = (partitionKey || {}).paths || [];
       if (paths.length && !query(body.query).containsPartitionKeys(paths)) {
         res.statusCode = 400;
-        return { Message: "missing partition keys" };
+        return { message: "missing partition keys" };
       }
     }
 

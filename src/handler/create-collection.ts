@@ -15,12 +15,12 @@ export default async (
   const body = await json(req);
   if (!body.id) {
     res.statusCode = 400;
-    return { Message: "missing id" };
+    return { message: "missing id" };
   }
 
   if (body.partitionKey && !Array.isArray(body.partitionKey.paths)) {
     res.statusCode = 400;
-    return { Message: "invalid partitionKey" };
+    return { message: "invalid partitionKey" };
   }
 
   const database = account.database(dbId);
@@ -31,7 +31,7 @@ export default async (
 
   if (database.collection(body.id).read()) {
     res.statusCode = 409;
-    return { Message: "conflict" };
+    return { message: "conflict" };
   }
 
   res.statusCode = 201;

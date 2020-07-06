@@ -23,7 +23,7 @@ export default async (
       const body = await json(req);
       if (!body.query) {
         res.statusCode = 400;
-        return { Message: "missing query" };
+        return { message: "missing query" };
       }
 
       const collection = account.database(dbId).collection(collId);
