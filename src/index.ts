@@ -17,7 +17,7 @@ const options: ServerOptions = {
 export default (opts?: ServerOptions) => {
   const account = new Account();
 
-  return createServer({...options, ...opts}, (req, res) => {
+  return createServer({ ...options, ...opts }, (req, res) => {
     const route = routes(req);
 
     (async () => {
@@ -32,16 +32,16 @@ export default (opts?: ServerOptions) => {
           body = { message: err.message };
           res.statusCode = 500;
         }
-        if(res.statusCode > 399 && !body.message) {
-            body.message = '';
+        if (res.statusCode > 399 && !body.message) {
+          body.message = "";
         }
       } else {
         res.statusCode = 400;
-        body = { message: 'no route' }
+        body = { message: "no route" };
       }
 
-      if(body && body._etag) {
-          res.setHeader('etag', body._etag);
+      if (body && body._etag) {
+        res.setHeader("etag", body._etag);
       }
 
       res.setHeader("content-type", "application/json");
@@ -58,11 +58,11 @@ export default (opts?: ServerOptions) => {
           "totalExecutionTimeInMs=0.00;queryCompileTimeInMs=0.00;queryLogicalPlanBuildTimeInMs=0.00;queryPhysicalPlanBuildTimeInMs=0.00;queryOptimizationTimeInMs=0.00;VMExecutionTimeInMs=0.00;indexLookupTimeInMs=0.00;documentLoadTimeInMs=0.00;systemFunctionExecuteTimeInMs=0.00;userFunctionExecuteTimeInMs=0.00;retrievedDocumentCount=0;retrievedDocumentSize=0;outputDocumentCount=1;outputDocumentSize=0;writeOutputTimeInMs=0.00;indexUtilizationRatio=0.00"
         );
       }
-      
+
       if (req.headers["a-im"] && res.statusCode === 200) {
         if (req.headers["if-none-match"]) {
           res.statusCode = 304;
-        } 
+        }
         res.setHeader("etag", "1");
       }
       res.end(JSON.stringify(body));
