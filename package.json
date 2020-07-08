@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --ignore-path .gitignore --write '{src,test}/**/*.ts'",
+    "format": "prettier --ignore-path .gitignore --write '{src/**/*.ts,test/*.ts}'",
     "format-staged": "git diff --cached --diff-filter=d --name-only '*.ts' | xargs prettier --list-different",
     "lint": "eslint --ignore-path .gitignore '{src,test}/**/*.ts'",
     "lint-staged": "git diff --cached --diff-filter=d --name-only '*.ts' | xargs eslint",
