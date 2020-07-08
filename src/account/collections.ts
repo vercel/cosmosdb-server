@@ -9,6 +9,7 @@ export default class Collections extends Items<Database, Collection> {
   _set(data: ItemObject) {
     const indexingPolicy: any = data.indexingPolicy || {};
     const _data = {
+      geospatialConfig: {},
       ...data,
       indexingPolicy: {
         ...indexingPolicy,
