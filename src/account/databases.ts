@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this, no-underscore-dangle, no-use-before-define */
+/* eslint-disable class-methods-use-this, no-bitwise, no-underscore-dangle, no-use-before-define */
 
 import Account from ".";
 import Database from "./database";

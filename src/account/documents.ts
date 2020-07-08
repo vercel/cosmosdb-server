@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this, no-underscore-dangle, no-use-before-define */
+/* eslint-disable class-methods-use-this, no-bitwise, no-underscore-dangle, no-use-before-define */
 import Collection from "./collection";
 import Document from "./document";
 import ItemObject from "./item-object";
