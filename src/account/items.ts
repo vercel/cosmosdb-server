@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this, no-underscore-dangle, no-use-before-define */
 import query from "@zeit/cosmosdb-query";
+import LRU from "lru-cache";
 import uuid from "uuid/v4";
 import ItemObject from "./item-object";
 import Item from "./item";
@@ -18,11 +19,14 @@ export default class Items<P extends Item, I extends Item> {
 
   _ridCount: number;
 
+  _queryCache: LRU<string, ReturnType<typeof query>>;
+
   constructor(parent: P) {
     this._parent = parent;
     this._data = new Map();
     this._index = new Map();
     this._ridCount = 0;
+    this._queryCache = new LRU({ max: 100 });
   }
 
   create(data: { [x: string]: any }) {
@@ -80,7 +84,7 @@ export default class Items<P extends Item, I extends Item> {
 
     const data = [...this._data.values()].map(item => item.read());
     const udf = this._userDefinedFunctions();
-    return query(params.query).exec(data, {
+    return this._getQuery(params.query).exec(data, {
       parameters: params.parameters,
       udf,
       maxItemCount,
@@ -100,7 +104,10 @@ export default class Items<P extends Item, I extends Item> {
     if (!this._parent.read()) return null;
 
     const data = [...this._data.values()].map(item => item.read());
-    return query("SELECT * FROM c").exec(data, { maxItemCount, continuation });
+    return this._getQuery("SELECT * FROM c").exec(data, {
+      maxItemCount,
+      continuation
+    });
   }
 
   replace(data: { [x: string]: any }) {
@@ -165,5 +172,14 @@ export default class Items<P extends Item, I extends Item> {
     | undefined
     | null {
     return null;
+  }
+
+  _getQuery(sql: string) {
+    let q = this._queryCache.get(sql);
+    if (!q) {
+      q = query(sql);
+      this._queryCache.set(sql, q);
+    }
+    return q;
   }
 }

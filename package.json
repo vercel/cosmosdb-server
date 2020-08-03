@@ -27,15 +27,17 @@
   },
   "dependencies": {
     "@zeit/cosmosdb-query": "0.5.2",
-    "path-to-regexp": "3.1.0",
     "big-integer": "1.6.46",
     "int64-buffer": "0.99.1007",
+    "lru-cache": "6.0.0",
+    "path-to-regexp": "3.1.0",
     "raw-body": "2.4.1",
     "uuid": "3.3.3"
   },
   "devDependencies": {
     "@azure/cosmos": "3.3.1",
     "@babel/core": "7.6.2",
+    "@types/lru-cache": "5.1.0",
     "@types/node": "12.7.9",
     "@types/uuid": "3.4.5",
     "@typescript-eslint/eslint-plugin": "2.3.2",
