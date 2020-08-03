@@ -6,6 +6,8 @@ import ItemObject from "./item-object";
 import Item from "./item";
 import ResourceId from "./resource-id";
 
+type Query = ReturnType<typeof query>;
+
 function ts() {
   return Math.floor(Date.now() / 1e3);
 }
@@ -19,7 +21,7 @@ export default class Items<P extends Item, I extends Item> {
 
   _ridCount: number;
 
-  _queryCache: LRU<string, ReturnType<typeof query>>;
+  _queryCache: LRU<string, Query>;
 
   constructor(parent: P) {
     this._parent = parent;
@@ -174,7 +176,7 @@ export default class Items<P extends Item, I extends Item> {
     return null;
   }
 
-  _getQuery(sql: string) {
+  _getQuery(sql: string): Query {
     let q = this._queryCache.get(sql);
     if (!q) {
       q = query(sql);
