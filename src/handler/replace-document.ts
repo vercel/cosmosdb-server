@@ -1,5 +1,6 @@
 import * as http from "http";
 import Account from "../account";
+import getPartitionKey from "../get-partition-key";
 import json from "../json";
 
 export default async (
@@ -29,11 +30,15 @@ export default async (
     return {};
   }
 
-  if (data.id !== body.id) {
+  /**
+   * Falling back to `id` partitionKey for now.
+   */
+  const partitionKey = getPartitionKey(collection) || "id";
+  if (data[partitionKey] !== body[partitionKey]) {
     res.statusCode = 400;
     return {
       code: "BadRequest",
-      message: "replacing id is not allowed"
+      message: `replacing partition key "${partitionKey}" is not allowed`
     };
   }
 
