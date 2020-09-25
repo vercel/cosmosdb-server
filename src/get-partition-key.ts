@@ -6,12 +6,7 @@ import Collection from "./account/collection";
  * @returns "<partitionKey>" string or null
  */
 export default function getPartitionKey(collection: Collection) {
-  // eslint-disable-next-line
-  const partitionKey = collection.partitionKeyRanges._parent._data.partitionKey;
-  if (!partitionKey) {
-    return null;
-  }
-  const [firstPath] = partitionKey.paths;
+  const [firstPath] = collection.read().partitionKey.paths;
   if (!firstPath) {
     return null;
   }
