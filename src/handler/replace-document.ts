@@ -1,6 +1,6 @@
 import * as http from "http";
 import Account from "../account";
-import getPartitionKey from "../get-partition-key";
+import getPartitionKeyPath from "../get-partition-key-path";
 import getValue from "../get-value";
 import json from "../json";
 
@@ -34,7 +34,7 @@ export default async (
   /**
    * Falling back to `id` partitionKey for now.
    */
-  const partitionKeyPath = (getPartitionKey(collection) || "id").split(".");
+  const partitionKeyPath = getPartitionKeyPath(collection) || ["id"];
   if (getValue(partitionKeyPath, data) !== getValue(partitionKeyPath, body)) {
     res.statusCode = 400;
     return {
