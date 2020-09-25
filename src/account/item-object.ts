@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 
-type ItemObject = {
+interface ItemObject {
   id: string;
   indexingPolicy?: {
     indexingMode: string | undefined | null;
@@ -12,7 +12,8 @@ type ItemObject = {
   _rid: string;
   _self: string;
   _ts: number;
-};
+  [key: string]: any;
+}
 
 // eslint-disable-next-line no-undef
 export default ItemObject;
