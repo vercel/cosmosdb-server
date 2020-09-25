@@ -1,9 +1,7 @@
 import Collection from "./account/collection";
 
 /**
- * Assumes only 1 partition key path in the following format:
- *  - paths: ["/<partitionKey>"]
- * @returns "<partitionKey>" string or null
+ * @returns string[] of partition key paths for a given collection
  */
 export default function getPartitionKeyPath(collection: Collection) {
   const [firstPath] = collection.read().partitionKey.paths;
