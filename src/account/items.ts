@@ -210,22 +210,7 @@ export default class Items<P extends Item, I extends Item> {
   }
 
   _getPartition(data: { [x: string]: any }): PartitionValue {
-    const partition = getValue(this._getPartitionKeyPath(), data);
-    if (partition === undefined) {
-      throw new Error(
-        `Missing partition "${this._getPartitionKeyPath().join(
-          "."
-        )}" value for "${JSON.stringify(data)}"`
-      );
-    }
-    if (typeof partition !== "string" && typeof partition !== "number") {
-      throw new Error(
-        `Partition value ${JSON.stringify(partition)} for "${
-          data.id
-        }" must be a number or string`
-      );
-    }
-    return partition;
+    return getValue(this._getPartitionKeyPath(), data);
   }
 
   _getPartitionKeyPath(): string[] {

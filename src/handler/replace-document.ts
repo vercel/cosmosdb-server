@@ -1,7 +1,7 @@
 import * as http from "http";
 import Account from "../account";
 import json from "../json";
-import getPartitionHeader from "../utils/get-partition-header";
+import getPartitionFromHeader from "../utils/get-partition-from-header";
 
 export default async (
   account: Account,
@@ -25,7 +25,7 @@ export default async (
 
   const collection = account.database(dbId).collection(collId);
   const data = collection
-    .document(docId, getPartitionHeader(req) || docId)
+    .document(docId, getPartitionFromHeader(req, docId))
     .read();
   if (!data) {
     res.statusCode = 404;

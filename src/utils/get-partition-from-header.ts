@@ -1,30 +1,35 @@
 import * as http from "http";
+import { PartitionValue } from "../types";
 
 const PARTITION_HEADER_KEY = `x-ms-documentdb-partitionkey`;
 
-function stringOrNull(x: any): string | null {
-  return typeof x === "string" ? x : null;
+function transform(value: any, defaultValue: any): PartitionValue {
+  if (!value) {
+    return value;
+  }
+  return typeof value === "object" ? defaultValue : value;
 }
 
 /**
  * @returns partition head from incoming request if it exists
  */
-export default function getPartitionHeader(
-  req: http.IncomingMessage
-): string | null {
+export default function getPartitionFromHeader(
+  req: http.IncomingMessage,
+  defaultValue: PartitionValue
+) {
   const header = req.headers[PARTITION_HEADER_KEY];
   if (!header) {
-    return null;
+    return defaultValue;
   }
   if (Array.isArray(header)) {
-    return stringOrNull(header[0]);
+    return transform(header[0], defaultValue);
   }
   const parsedHeader = JSON.parse(header);
   if (typeof parsedHeader === "string") {
-    return parsedHeader;
+    return transform(parsedHeader, defaultValue);
   }
   if (Array.isArray(parsedHeader)) {
-    return stringOrNull(parsedHeader[0]);
+    return transform(parsedHeader[0], defaultValue);
   }
   throw new Error(
     `Failed to parse ${PARTITION_HEADER_KEY} headers in ${req.rawHeaders.join(

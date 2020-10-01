@@ -1,6 +1,6 @@
 import * as http from "http";
 import Account from "../account";
-import getPartitionHeader from "../utils/get-partition-header";
+import getPartitionFromHeader from "../utils/get-partition-from-header";
 
 export default (
   account: Account,
@@ -17,7 +17,7 @@ export default (
   }
 ) => {
   const collection = account.database(dbId).collection(collId);
-  const partition = getPartitionHeader(req) || docId;
+  const partition = getPartitionFromHeader(req, docId);
   const data = collection.document(docId, partition).read();
   if (!data) {
     res.statusCode = 404;
