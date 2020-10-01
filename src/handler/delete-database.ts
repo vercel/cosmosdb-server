@@ -17,5 +17,5 @@ export default (
   }
 
   res.statusCode = 204;
-  return account.databases.delete(dbId);
+  return account.databases.delete(dbId, dbId);
 };

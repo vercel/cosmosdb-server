@@ -36,7 +36,7 @@ export default async (
   }
 
   try {
-    return database.collections.replace(body);
+    return database.collections.replace(body, data);
   } catch (err) {
     if (err.badRequest) {
       res.statusCode = 400;

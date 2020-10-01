@@ -8,10 +8,10 @@ export default class Database extends Item {
 
   constructor(data: ItemObject | undefined | null) {
     super(data);
-    this.collections = new Collections(this);
+    this.collections = new Collections(this, ["/id"]);
   }
 
   collection(idOrRid: string) {
-    return this.collections._item(idOrRid);
+    return this.collections._item(idOrRid, idOrRid);
   }
 }

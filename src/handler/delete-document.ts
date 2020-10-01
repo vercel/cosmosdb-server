@@ -1,5 +1,6 @@
 import * as http from "http";
 import Account from "../account";
+import getPartitionHeader from "../utils/get-partition-header";
 
 export default (
   account: Account,
@@ -16,7 +17,8 @@ export default (
   }
 ) => {
   const collection = account.database(dbId).collection(collId);
-  const data = collection.document(docId).read();
+  const partition = getPartitionHeader(req) || docId;
+  const data = collection.document(docId, partition).read();
   if (!data) {
     res.statusCode = 404;
     return {};
@@ -32,5 +34,5 @@ export default (
   }
 
   res.statusCode = 204;
-  return collection.documents.delete(docId);
+  return collection.documents.delete(docId, partition);
 };
