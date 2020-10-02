@@ -19,7 +19,7 @@ export default class UserDefinedFunctions extends Items<
   };
 
   constructor(parent: Collection) {
-    super(parent);
+    super(parent, ["/id"]);
     this.functions = {};
   }
 
@@ -49,13 +49,13 @@ export default class UserDefinedFunctions extends Items<
   }
 
   replace({ id, body }: { id: string; body: string }) {
-    const oldData = this._item(id).read();
+    const oldData = this._item(id, id).read();
     if (!oldData) {
       throw new Error("does not exist");
     }
 
     this.functions[oldData.id] = define(body);
-    return super.replace({ id, body });
+    return super.replace({ id, body }, oldData);
   }
 
   create({ id, body }: { id: string; body: string }) {
@@ -69,12 +69,12 @@ export default class UserDefinedFunctions extends Items<
   }
 
   delete(idOrRid: string) {
-    const data = this._item(idOrRid).read();
+    const data = this._item(idOrRid, idOrRid).read();
     if (!data) {
       throw new Error("does not exist");
     }
 
     delete this.functions[data.id];
-    return super.delete(idOrRid);
+    return super.delete(idOrRid, idOrRid);
   }
 }

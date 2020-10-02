@@ -1,6 +1,7 @@
 import * as http from "http";
 import Account from "../account";
 import json from "../json";
+import getPartitionFromHeader from "../utils/get-partition-from-header";
 
 export default async (
   account: Account,
@@ -27,7 +28,9 @@ export default async (
   }
 
   if (req.headers["if-match"]) {
-    const data = collection.document(body.id).read();
+    const data = collection
+      .document(body.id, getPartitionFromHeader(req, body.id))
+      .read();
     if (data && req.headers["if-match"] !== data._etag) {
       res.statusCode = 412;
       return {

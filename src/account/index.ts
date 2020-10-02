@@ -13,10 +13,10 @@ export default class Account extends Item {
       _self: "",
       _ts: 0
     });
-    this.databases = new Databases(this);
+    this.databases = new Databases(this, ["/id"]);
   }
 
   database(idOrRid: string) {
-    return this.databases._item(idOrRid);
+    return this.databases._item(idOrRid, idOrRid);
   }
 }

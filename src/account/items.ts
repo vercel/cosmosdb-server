@@ -4,7 +4,8 @@ import LRU from "lru-cache";
 import uuid from "uuid/v4";
 import ItemObject from "./item-object";
 import Item from "./item";
-import ResourceId from "./resource-id";
+import getValue from "../utils/get-value";
+import { PartitionValue } from "../types";
 
 type Query = ReturnType<typeof query>;
 
@@ -23,16 +24,20 @@ export default class Items<P extends Item, I extends Item> {
 
   _queryCache: LRU<string, Query>;
 
-  constructor(parent: P) {
+  _partitionKeyPath: string[];
+
+  constructor(parent: P, partitionKeyPath: string[]) {
     this._parent = parent;
     this._data = new Map();
     this._index = new Map();
     this._ridCount = 0;
     this._queryCache = new LRU({ max: 100 });
+    this._partitionKeyPath = partitionKeyPath;
   }
 
   create(data: { [x: string]: any }) {
-    if (this._item(data.id).read()) {
+    const partition = this._getPartition(data);
+    if (this._item(data.id, partition).read()) {
       const err = new Error(
         "Resource with specified id or name already exists."
       );
@@ -54,13 +59,13 @@ export default class Items<P extends Item, I extends Item> {
     return this._set(_data);
   }
 
-  delete(idOrRid: string) {
-    const data = this._item(idOrRid).read();
+  delete(idOrRid: string, partition: PartitionValue) {
+    const data = this._item(idOrRid, partition).read();
     if (!data) {
       throw new Error("does not exist");
     }
 
-    this._index.delete(data.id);
+    this._index.delete(this._getId(idOrRid, partition));
     this._data.delete(data._rid);
   }
 
@@ -112,8 +117,20 @@ export default class Items<P extends Item, I extends Item> {
     });
   }
 
-  replace(data: { [x: string]: any }) {
-    const oldData = this._item(data.id).read();
+  replace(data: { [x: string]: any }, original: { [x: string]: any }) {
+    if (this._getPartition(data) !== this._getPartition(original)) {
+      const err = new Error(
+        `replacing partition key "${this._getPartitionKeyPath().join(
+          "."
+        )}" is not allowed`
+      );
+      // @ts-ignore
+      err.badRequest = true;
+      throw err;
+    }
+
+    const partition = this._getPartition(data);
+    const oldData = this._item(data.id, partition).read();
     if (!oldData || data.id !== oldData.id) {
       const err = new Error("replacing id is not allowed");
       // @ts-ignore
@@ -134,12 +151,13 @@ export default class Items<P extends Item, I extends Item> {
   }
 
   upsert(data: { [x: string]: any }) {
-    const oldData = this._item(data.id).read();
-    return oldData ? this.replace(data) : this.create(data);
+    const partition = this._getPartition(data);
+    const oldData = this._item(data.id, partition).read();
+    return oldData ? this.replace(data, oldData) : this.create(data);
   }
 
-  _item(idOrRid: string): I {
-    const rid = this._toRid(idOrRid);
+  _item(idOrRid: string, partition: PartitionValue): I {
+    const rid = this._toRid(idOrRid, partition);
     return this._data.get(rid) || this._newItem();
   }
 
@@ -158,13 +176,15 @@ export default class Items<P extends Item, I extends Item> {
   }
 
   _set(data: ItemObject) {
+    const id = this._getId(data.id, this._getPartition(data));
     this._data.set(data._rid, this._newItem(data));
-    this._index.set(data.id, data._rid);
+    this._index.set(id, data._rid);
     return data;
   }
 
-  _toRid(idOrRid: string) {
-    return this._index.get(idOrRid) || idOrRid;
+  _toRid(idOrRid: string, partition: PartitionValue) {
+    const id = this._getId(idOrRid, partition);
+    return this._index.get(id) || idOrRid;
   }
 
   _userDefinedFunctions():
@@ -183,5 +203,25 @@ export default class Items<P extends Item, I extends Item> {
       this._queryCache.set(sql, q);
     }
     return q;
+  }
+
+  _getId(id: string, partition: PartitionValue) {
+    return [partition || id, id].join(":");
+  }
+
+  _getPartition(data: { [x: string]: any }): PartitionValue {
+    return getValue(this._getPartitionKeyPath(), data);
+  }
+
+  _getPartitionKeyPath(): string[] {
+    const [firstPath] = this._partitionKeyPath;
+    if (!firstPath) {
+      return ["id"]; // Default/fallback to `id` as partition key for now
+    }
+    const path = firstPath.slice(1).split("/");
+    if (path.length === 1 && path[0] === "_partitionKey") {
+      return ["id"];
+    }
+    return path;
   }
 }

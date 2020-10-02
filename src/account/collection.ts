@@ -4,6 +4,7 @@ import Item from "./item";
 import Documents from "./documents";
 import PartitionKeyRanges from "./partition-key-ranges";
 import UserDefinedFunctions from "./user-defined-functions";
+import { PartitionValue } from "../types";
 
 export default class Collection extends Item {
   documents: Documents;
@@ -14,8 +15,11 @@ export default class Collection extends Item {
 
   constructor(data: ItemObject | undefined | null) {
     super(data);
-    this.documents = new Documents(this);
-    this.partitionKeyRanges = new PartitionKeyRanges(this);
+    this.documents = new Documents(
+      this,
+      ((data || {}).partitionKey || {}).paths || ["/id"]
+    );
+    this.partitionKeyRanges = new PartitionKeyRanges(this, ["/id"]);
     this.userDefinedFunctions = new UserDefinedFunctions(this);
 
     if (data) {
@@ -31,11 +35,11 @@ export default class Collection extends Item {
     }
   }
 
-  document(idOrRid: string) {
-    return this.documents._item(idOrRid);
+  document(idOrRid: string, partition: PartitionValue) {
+    return this.documents._item(idOrRid, partition);
   }
 
   userDefinedFunction(idOrRid: string) {
-    return this.userDefinedFunctions._item(idOrRid);
+    return this.userDefinedFunctions._item(idOrRid, idOrRid);
   }
 }
