@@ -214,18 +214,14 @@ export default class Items<P extends Item, I extends Item> {
   }
 
   _getPartitionKeyPath(): string[] {
-    try {
-      const [firstPath] = this._partitionKeyPath;
-      if (!firstPath) {
-        return ["id"]; // Default/fallback to `id` as partition key for now
-      }
-      const path = firstPath.slice(1).split("/");
-      if (path.length === 1 && path[0] === "_partitionKey") {
-        return ["id"];
-      }
-      return path;
-    } catch (error) {
+    const [firstPath] = this._partitionKeyPath;
+    if (!firstPath) {
+      return ["id"]; // Default/fallback to `id` as partition key for now
+    }
+    const path = firstPath.slice(1).split("/");
+    if (path.length === 1 && path[0] === "_partitionKey") {
       return ["id"];
     }
+    return path;
   }
 }

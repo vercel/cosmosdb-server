@@ -24,13 +24,25 @@ export default function getPartitionFromHeader(
   if (Array.isArray(header)) {
     return transform(header[0], defaultValue);
   }
-  const parsedHeader = JSON.parse(header);
+
+  let parsedHeader;
+  try {
+    parsedHeader = JSON.parse(header);
+  } catch (error) {
+    throw new Error(
+      `Failed to parse ${PARTITION_HEADER_KEY} headers in ${req.rawHeaders.join(
+        "; "
+      )}`
+    );
+  }
+
   if (typeof parsedHeader === "string") {
     return transform(parsedHeader, defaultValue);
   }
   if (Array.isArray(parsedHeader)) {
     return transform(parsedHeader[0], defaultValue);
   }
+
   throw new Error(
     `Failed to parse ${PARTITION_HEADER_KEY} headers in ${req.rawHeaders.join(
       "; "
