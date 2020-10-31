@@ -22,8 +22,11 @@ export default (rules: { [x: string]: { [y: string]: Function } }) => {
 
     let { method } = req;
     if (
-      trueHeader(req, "x-ms-documentdb-isquery") ||
-      req.headers["content-type"] === "application/query+json"
+      req.method == "POST" &&
+      (
+        trueHeader(req, "x-ms-documentdb-isquery") ||
+        req.headers["content-type"] === "application/query+json"
+      )
     ) {
       method += "_QUERY";
     } else if (trueHeader(req, "x-ms-documentdb-is-upsert")) {
