@@ -17,6 +17,6 @@ export default class Account extends Item {
   }
 
   database(idOrRid: string) {
-    return this.databases._item(idOrRid, idOrRid);
+    return this.databases._item("/id", idOrRid, idOrRid);
   }
 }

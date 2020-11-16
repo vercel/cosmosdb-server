@@ -17,7 +17,14 @@ export default class Collection extends Item {
     super(data);
     this.documents = new Documents(
       this,
-      ((data || {}).partitionKey || {}).paths || ["/id"]
+      ((data || {}).partitionKey || {}).paths || ["/id"],
+      (((data || {}).uniqueKeyPolicy || {}).uniqueKeys || []).reduce(
+        (accum: string[], v) => {
+          v.paths.forEach(path => accum.push(path));
+          return accum;
+        },
+        []
+      )
     );
     this.partitionKeyRanges = new PartitionKeyRanges(this, ["/id"]);
     this.userDefinedFunctions = new UserDefinedFunctions(this);
@@ -36,10 +43,10 @@ export default class Collection extends Item {
   }
 
   document(idOrRid: string, partition: PartitionValue) {
-    return this.documents._item(idOrRid, partition);
+    return this.documents._item("/id", idOrRid, partition);
   }
 
   userDefinedFunction(idOrRid: string) {
-    return this.userDefinedFunctions._item(idOrRid, idOrRid);
+    return this.userDefinedFunctions._item("/id", idOrRid, idOrRid);
   }
 }
