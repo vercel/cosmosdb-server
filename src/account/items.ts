@@ -230,19 +230,6 @@ export default class Items<P extends Item, I extends Item> {
     return getValue(this._getPartitionKeyPath(), data);
   }
 
-  _getUniqueKeys(data: { [x: string]: any }): { [key: string]: any } {
-    return this._uniqueKeyPaths.reduce(
-      (a, key) => {
-        const keyPath = key.slice(1).split("/"); // /profile/username -> [profile, username]
-        const value = getValue(keyPath, data);
-        // eslint-disable-next-line
-        a[key] = value;
-        return a;
-      },
-      {} as { [key: string]: any }
-    );
-  }
-
   _getPartitionKeyPath(): string[] {
     const [firstPath] = this._partitionKeyPath;
     if (!firstPath) {
