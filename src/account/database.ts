@@ -12,6 +12,6 @@ export default class Database extends Item {
   }
 
   collection(idOrRid: string) {
-    return this.collections._item(idOrRid, idOrRid);
+    return this.collections._item("/id", idOrRid, idOrRid);
   }
 }

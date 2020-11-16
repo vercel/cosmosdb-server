@@ -26,25 +26,35 @@ export default class Items<P extends Item, I extends Item> {
 
   _partitionKeyPath: string[];
 
-  constructor(parent: P, partitionKeyPath: string[]) {
+  _uniqueKeyPaths: string[];
+
+  constructor(
+    parent: P,
+    partitionKeyPath: string[],
+    uniqueKeyPaths: string[] = []
+  ) {
     this._parent = parent;
     this._data = new Map();
     this._index = new Map();
     this._ridCount = 0;
     this._queryCache = new LRU({ max: 100 });
     this._partitionKeyPath = partitionKeyPath;
+    this._uniqueKeyPaths = uniqueKeyPaths.concat("/id");
   }
 
   create(data: { [x: string]: any }) {
     const partition = this._getPartition(data);
-    if (this._item(data.id, partition).read()) {
-      const err = new Error(
-        "Resource with specified id or name already exists."
-      );
-      // @ts-ignore
-      err.conflict = true;
-      throw err;
-    }
+    this._uniqueKeyPaths.forEach(keyPath => {
+      const keyPathValue = getValue(keyPath.slice(1).split("/"), data);
+      if (this._item(keyPath, keyPathValue, partition).read()) {
+        const err = new Error(
+          `Resource with specified ${keyPath.slice(1)} already exists.`
+        );
+        // @ts-ignore
+        err.conflict = true;
+        throw err;
+      }
+    });
 
     this._ridCount += 1;
     const _rid = this._rid(this._ridCount);
@@ -60,12 +70,12 @@ export default class Items<P extends Item, I extends Item> {
   }
 
   delete(idOrRid: string, partition: PartitionValue) {
-    const data = this._item(idOrRid, partition).read();
+    const data = this._item("/id", idOrRid, partition).read();
     if (!data) {
       throw new Error("does not exist");
     }
 
-    this._index.delete(this._getId(idOrRid, partition));
+    this._index.delete(this._getId("/id", idOrRid, partition));
     this._data.delete(data._rid);
   }
 
@@ -130,7 +140,7 @@ export default class Items<P extends Item, I extends Item> {
     }
 
     const partition = this._getPartition(data);
-    const oldData = this._item(data.id, partition).read();
+    const oldData = this._item("/id", data.id, partition).read();
     if (!oldData || data.id !== oldData.id) {
       const err = new Error("replacing id is not allowed");
       // @ts-ignore
@@ -152,12 +162,12 @@ export default class Items<P extends Item, I extends Item> {
 
   upsert(data: { [x: string]: any }) {
     const partition = this._getPartition(data);
-    const oldData = this._item(data.id, partition).read();
+    const oldData = this._item("/id", data.id, partition).read();
     return oldData ? this.replace(data, oldData) : this.create(data);
   }
 
-  _item(idOrRid: string, partition: PartitionValue): I {
-    const rid = this._toRid(idOrRid, partition);
+  _item(keyPath: string, keyPathValue: string, partition: PartitionValue): I {
+    const rid = this._toRid(keyPath, keyPathValue, partition);
     return this._data.get(rid) || this._newItem();
   }
 
@@ -176,15 +186,22 @@ export default class Items<P extends Item, I extends Item> {
   }
 
   _set(data: ItemObject) {
-    const id = this._getId(data.id, this._getPartition(data));
+    this._uniqueKeyPaths.forEach(keyPath => {
+      const keyPathValue = getValue(keyPath.slice(1).split("/"), data);
+      const id = this._getId(keyPath, keyPathValue, this._getPartition(data));
+      this._index.set(id, data._rid);
+    });
     this._data.set(data._rid, this._newItem(data));
-    this._index.set(id, data._rid);
     return data;
   }
 
-  _toRid(idOrRid: string, partition: PartitionValue) {
-    const id = this._getId(idOrRid, partition);
-    return this._index.get(id) || idOrRid;
+  _toRid(
+    keyPath: string,
+    keyPathValueOrRid: string,
+    partition: PartitionValue
+  ) {
+    const id = this._getId(keyPath, keyPathValueOrRid, partition);
+    return this._index.get(id) || keyPathValueOrRid;
   }
 
   _userDefinedFunctions():
@@ -205,12 +222,25 @@ export default class Items<P extends Item, I extends Item> {
     return q;
   }
 
-  _getId(id: string, partition: PartitionValue) {
-    return [partition || id, id].join(":");
+  _getId(keyPath: string, id: string, partition: PartitionValue) {
+    return [partition || id, keyPath, id].join(":");
   }
 
   _getPartition(data: { [x: string]: any }): PartitionValue {
     return getValue(this._getPartitionKeyPath(), data);
+  }
+
+  _getUniqueKeys(data: { [x: string]: any }): { [key: string]: any } {
+    return this._uniqueKeyPaths.reduce(
+      (a, key) => {
+        const keyPath = key.slice(1).split("/"); // /profile/username -> [profile, username]
+        const value = getValue(keyPath, data);
+        // eslint-disable-next-line
+        a[key] = value;
+        return a;
+      },
+      {} as { [key: string]: any }
+    );
   }
 
   _getPartitionKeyPath(): string[] {

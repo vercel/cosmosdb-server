@@ -49,7 +49,7 @@ export default class UserDefinedFunctions extends Items<
   }
 
   replace({ id, body }: { id: string; body: string }) {
-    const oldData = this._item(id, id).read();
+    const oldData = this._item("/id", id, id).read();
     if (!oldData) {
       throw new Error("does not exist");
     }
@@ -69,7 +69,7 @@ export default class UserDefinedFunctions extends Items<
   }
 
   delete(idOrRid: string) {
-    const data = this._item(idOrRid, idOrRid).read();
+    const data = this._item("/id", idOrRid, idOrRid).read();
     if (!data) {
       throw new Error("does not exist");
     }

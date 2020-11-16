@@ -8,6 +8,9 @@ interface ItemObject {
   partitionKey?: {
     paths: string[];
   };
+  uniqueKeyPolicy?: {
+    uniqueKeys: { paths: string[] }[];
+  };
   _etag: string;
   _rid: string;
   _self: string;
