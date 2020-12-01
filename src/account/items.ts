@@ -154,11 +154,9 @@ export default class Items<P extends Item, I extends Item> {
         return;
       }
 
-      const newKeyPathValue = getValue(keyPath.slice(1).split("/"), data);
-      const originalKeyPathValue = getValue(
-        keyPath.slice(1).split("/"),
-        original
-      );
+      const keys = keyPath.slice(1).split("/");
+      const newKeyPathValue = getValue(keys, data);
+      const originalKeyPathValue = getValue(keys, original);
       if (newKeyPathValue === originalKeyPathValue) {
         return;
       }
