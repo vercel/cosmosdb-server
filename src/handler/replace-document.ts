@@ -42,11 +42,15 @@ export default async (
   }
 
   try {
-    return collection.documents.replace(body, data);
+    return await collection.documents.replace(body, data);
   } catch (error) {
     if (error.badRequest) {
       res.statusCode = 400;
       return { code: "BadRequest", message: error.message };
+    }
+    if (error.conflict) {
+      res.statusCode = 409;
+      return { message: error.message, code: "Conflict" };
     }
     throw error;
   }

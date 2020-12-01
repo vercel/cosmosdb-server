@@ -36,11 +36,15 @@ export default async (
   }
 
   try {
-    return database.collections.replace(body, data);
+    return await database.collections.replace(body, data);
   } catch (err) {
     if (err.badRequest) {
       res.statusCode = 400;
       return { message: err.message };
+    }
+    if (err.conflict) {
+      res.statusCode = 409;
+      return { message: err.message, code: "Conflict" };
     }
 
     throw err;

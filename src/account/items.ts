@@ -148,6 +148,29 @@ export default class Items<P extends Item, I extends Item> {
       throw err;
     }
 
+    this._uniqueKeyPaths.forEach(keyPath => {
+      // No need to check /id here since we explicitly checked it earlier
+      if (keyPath === "/id") {
+        return;
+      }
+
+      const keys = keyPath.slice(1).split("/");
+      const newKeyPathValue = getValue(keys, data);
+      const originalKeyPathValue = getValue(keys, original);
+      if (newKeyPathValue === originalKeyPathValue) {
+        return;
+      }
+
+      if (this._item(keyPath, newKeyPathValue, partition).read()) {
+        const err = new Error(
+          `Resource with specified ${keyPath.slice(1)} already exists.`
+        );
+        // @ts-ignore
+        err.conflict = true;
+        throw err;
+      }
+    });
+
     const { _rid, _self } = oldData;
     const _data = {
       ...data,
