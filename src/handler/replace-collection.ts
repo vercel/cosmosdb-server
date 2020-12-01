@@ -42,6 +42,10 @@ export default async (
       res.statusCode = 400;
       return { message: err.message };
     }
+    if (err.conflict) {
+      res.statusCode = 409;
+      return { message: err.message };
+    }
 
     throw err;
   }
