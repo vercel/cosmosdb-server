@@ -75,7 +75,11 @@ export default class Items<P extends Item, I extends Item> {
       throw new Error("does not exist");
     }
 
-    this._index.delete(this._getId("/id", idOrRid, partition));
+    this._uniqueKeyPaths.forEach(keyPath => {
+      const keyPathValue = getValue(keyPath.slice(1).split("/"), data);
+      const id = this._getId(keyPath, keyPathValue, this._getPartition(data));
+      this._index.delete(id);
+    });
     this._data.delete(data._rid);
   }
 
@@ -180,6 +184,7 @@ export default class Items<P extends Item, I extends Item> {
       _self,
       _ts: ts()
     };
+    this.delete(oldData.id, partition);
     return this._set(_data);
   }
 
