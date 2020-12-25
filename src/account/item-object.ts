@@ -11,10 +11,10 @@ interface ItemObject {
   uniqueKeyPolicy?: {
     uniqueKeys: { paths: string[] }[];
   };
-  _etag: string;
+  _etag?: string;
   _rid: string;
   _self: string;
-  _ts: number;
+  _ts?: number;
   [key: string]: any;
 }
 
