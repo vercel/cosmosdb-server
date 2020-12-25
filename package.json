@@ -1,6 +1,6 @@
 {
   "name": "@zeit/cosmosdb-server",
-  "version": "0.9.3",
+  "version": "0.10.0",
   "description": "A Cosmos DB server implementation",
   "license": "MIT",
   "main": "lib/index.js",
