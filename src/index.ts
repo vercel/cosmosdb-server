@@ -15,9 +15,9 @@ const options: ServerOptions = {
 };
 
 export default (opts?: ServerOptions) => {
-  const account = new Account();
+  let account: Account | undefined;
 
-  return createServer({ ...options, ...opts }, (req, res) => {
+  const server = createServer({ ...options, ...opts }, (req, res) => {
     const route = routes(req);
 
     (async () => {
@@ -74,5 +74,14 @@ export default (opts?: ServerOptions) => {
         res.end("");
       }
     });
+  }).on("listening", () => {
+    const address = server.address();
+    if (typeof address === "object" && address) {
+      account = new Account(address.port);
+    } else {
+      throw new Error(`Unexpected address type: ${address}`);
+    }
   });
+
+  return server;
 };
