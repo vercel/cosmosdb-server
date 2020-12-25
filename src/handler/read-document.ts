@@ -10,8 +10,7 @@ import getPartitionFromHeader from "../utils/get-partition-from-header";
  * data.
  */
 function getCollectionPartitionKeys(collection: ItemObject) {
-  if (!collection.partitionKey)
-    return [];
+  if (!collection.partitionKey) return [];
 
   return collection.partitionKey.paths
     .map(path => path.slice(1))
