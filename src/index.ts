@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { createServer, ServerOptions } from "https";
+import * as net from "net";
 import { join } from "path";
 import * as tls from "tls";
 import uuid from "uuid/v4";
@@ -77,7 +78,10 @@ export default (opts?: ServerOptions) => {
   }).on("listening", () => {
     const address = server.address();
     if (typeof address === "object" && address) {
-      account = new Account(address.port);
+      const { address:host, port } = address as net.AddressInfo;
+      const hostname = (host == '0.0.0.0' || host == '::') ? 'localhost' : host;
+
+      account = new Account(hostname, port);
     } else {
       throw new Error(`Unexpected address type: ${address}`);
     }
