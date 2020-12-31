@@ -78,8 +78,8 @@ export default (opts?: ServerOptions) => {
   }).on("listening", () => {
     const address = server.address();
     if (typeof address === "object" && address) {
-      const { address:host, port } = address as net.AddressInfo;
-      const hostname = (host == '0.0.0.0' || host == '::') ? 'localhost' : host;
+      const { address: host, port } = address as net.AddressInfo;
+      const hostname = host === "0.0.0.0" || host === "::" ? "localhost" : host;
 
       account = new Account(hostname, port);
     } else {
