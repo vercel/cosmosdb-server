@@ -5,24 +5,24 @@ import Item from "./item";
 export default class Account extends Item {
   databases: Databases;
 
-  constructor(port: number) {
+  constructor(host: string, port: number) {
     super({
-      _rid: "localhost",
+      _rid: host,
       _self: "",
       _dbs: "//dbs/",
-      id: "localhost",
+      id: host,
       media: "//media/",
       addresses: "//addresses/",
       writableLocations: [
         {
           name: "South Central US",
-          databaseAccountEndpoint: `https://localhost:${port}/`
+          databaseAccountEndpoint: `https://${host}:${port}/`
         }
       ],
       readableLocations: [
         {
           name: "South Central US",
-          databaseAccountEndpoint: `https://localhost:${port}/`
+          databaseAccountEndpoint: `https://${host}:${port}/`
         }
       ],
       enableMultipleWriteLocations: false,

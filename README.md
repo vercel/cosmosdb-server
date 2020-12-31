@@ -59,6 +59,12 @@ See [`https.createServer`](https://nodejs.org/api/https.html#https_https_creates
 - Container operations.
 - Item operations.
 - User-defined function operations.
-- Any SQL queries except spatial functions
+- Any SQL queries except the spatial functions `ST_ISVALID` and `ST_ISVALIDDETAILED`. Other spatial functions are supported; however, the `ST_DISTANCE` function uses centroid distances and results may differ from Cosmos DB values.
 
 It may not support newly added features yet. Please report on the Github issue if you find one.
+
+## Developing
+
+To build the project, use `yarn build`.
+
+To run the server from development code, after building, use `node lib/cli.js`.
