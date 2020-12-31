@@ -3,7 +3,7 @@ import * as net from "net";
 import cosmosDBServer from ".";
 
 const argv = process.argv.slice(2);
-const args: { help?: boolean; port?: number, hostname?: string } = {};
+const args: { help?: boolean; port?: number; hostname?: string } = {};
 while (argv.length) {
   const key = argv.shift();
   switch (key) {
@@ -39,11 +39,12 @@ Options:
 
 const server = cosmosDBServer().listen(args.port, args.hostname, () => {
   const { address, family, port } = server.address() as net.AddressInfo;
-  const hostname = args.hostname ? args.hostname : (
-    family === "IPv6" ? `[${address}]` : address
-  );
+  // eslint-disable-next-line no-nested-ternary
+  const hostname = args.hostname
+    ? args.hostname
+    : family === "IPv6"
+    ? `[${address}]`
+    : address;
   // eslint-disable-next-line no-console
-  console.log(
-    `Ready to accept connections at ${hostname}:${port}`
-  );
+  console.log(`Ready to accept connections at ${hostname}:${port}`);
 });
