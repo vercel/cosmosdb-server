@@ -87,5 +87,17 @@ export default (opts?: ServerOptions) => {
     }
   });
 
+  const gracefulShutdown = () => {
+    console.debug("Attempting a graceful shutdown...");
+
+    server.close(() => {
+      console.debug("Existing connections closed. Exiting...");
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGINT', gracefulShutdown);
+  process.on('SIGTERM', gracefulShutdown);
+
   return server;
 };
