@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this, no-underscore-dangle, no-use-before-define */
-import query from "@zeit/cosmosdb-query";
+import query, { CompositeIndex } from "@zeit/cosmosdb-query";
 import LRU from "lru-cache";
 import uuid from "uuid/v4";
 import ItemObject from "./item-object";
@@ -105,12 +105,25 @@ export default class Items<P extends Item, I extends Item> {
 
     const data = [...this._data.values()].map(item => item.read());
     const udf = this._userDefinedFunctions();
-    return this._getQuery(params.query).exec(data, {
+    const parent = this._parent.read();
+    const compositeIndexes = ((parent.indexingPolicy
+      ? parent.indexingPolicy.compositeIndexes
+      : null) || []) as CompositeIndex[][];
+    const q = this._getQuery(params.query);
+    const options = {
       parameters: params.parameters,
       udf,
       maxItemCount,
-      continuation
-    });
+      continuation,
+      compositeIndexes
+    };
+    try {
+      return q.exec(data, options);
+    } catch (err) {
+      // @ts-ignore
+      err.badRequest = true;
+      throw err;
+    }
   }
 
   read({

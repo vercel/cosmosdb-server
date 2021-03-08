@@ -1,13 +1,21 @@
 /* eslint-disable class-methods-use-this, no-bitwise, no-underscore-dangle, no-use-before-define */
 import Collection from "./collection";
 import Database from "./database";
-import ItemObject from "./item-object";
+import ItemObject, { CompositeIndex } from "./item-object";
 import Items from "./items";
 import ResourceId from "./resource-id";
 
 export default class Collections extends Items<Database, Collection> {
   _set(data: ItemObject) {
     const indexingPolicy: any = data.indexingPolicy || {};
+
+    const compositeIndexes = indexingPolicy.compositeIndexes
+      ? indexingPolicy.compositeIndexes.map((indexes: CompositeIndex[]) =>
+          // set default order
+          indexes.map(index => ({ order: "ascending", ...index }))
+        )
+      : undefined;
+
     const _data = {
       geospatialConfig: {},
       ...data,
@@ -15,7 +23,8 @@ export default class Collections extends Items<Database, Collection> {
         ...indexingPolicy,
         indexingMode: (
           indexingPolicy.indexingMode || "consistent"
-        ).toLowerCase()
+        ).toLowerCase(),
+        compositeIndexes
       }
     };
     return super._set(_data);

@@ -4,6 +4,7 @@ interface ItemObject {
   id: string;
   indexingPolicy?: {
     indexingMode: string | undefined | null;
+    compositeIndexes?: CompositeIndex[][];
   };
   partitionKey?: {
     paths: string[];
@@ -16,6 +17,11 @@ interface ItemObject {
   _self: string;
   _ts?: number;
   [key: string]: any;
+}
+
+export interface CompositeIndex {
+  path: string;
+  order?: "ascending" | "descending";
 }
 
 // eslint-disable-next-line no-undef

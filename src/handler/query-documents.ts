@@ -35,5 +35,14 @@ export default async (
       }
     }
 
-    return collection.documents.query(body, { continuation, maxItemCount });
+    try {
+      return collection.documents.query(body, { continuation, maxItemCount });
+    } catch (err) {
+      if (err.badRequest) {
+        res.statusCode = 400;
+        return { message: err.message };
+      }
+
+      throw err;
+    }
   });
