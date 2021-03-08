@@ -116,3 +116,119 @@ export const querySyntaxError = withTestEnv(async client => {
     assert.strictEqual(err.code, 400);
   }
 });
+
+export const failsToCreateInvalidCompositeIndexes = withTestEnv(
+  async client => {
+    const { database } = await client.databases.create({ id: "test-database" });
+    const params = {
+      id: "test-container",
+      indexingPolicy: {
+        compositeIndexes: [
+          [
+            {
+              path: "/sortKey1",
+              order: "invalid"
+            },
+            {
+              path: "/sortKey2",
+              order: "descending"
+            }
+          ]
+        ]
+      }
+    };
+    try {
+      await database.containers.create(params);
+      assert.fail();
+    } catch (err) {
+      assert.strictEqual(err.code, 400);
+    }
+  }
+);
+
+export const queryWithMultipleOrderBy = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "test-database" });
+  const { container } = await database.containers.create({
+    id: "test-container",
+    indexingPolicy: {
+      compositeIndexes: [
+        [
+          {
+            path: "/sortKey1"
+          },
+          {
+            path: "/sortKey2",
+            order: "descending"
+          }
+        ]
+      ]
+    }
+  });
+
+  const data = [
+    { id: "id1", sortKey1: "a", sortKey2: "a" },
+    { id: "id2", sortKey1: "a", sortKey2: "b" },
+    { id: "id3", sortKey1: "b", sortKey2: "a" },
+    { id: "id4", sortKey1: "b", sortKey2: "b" }
+  ];
+  await Promise.all(data.map(d => container.items.create(d)));
+
+  const { resources } = await container.items
+    .query(
+      "SELECT c.id, c.sortKey1, c.sortKey2 FROM c ORDER BY c.sortKey1, c.sortKey2 DESC"
+    )
+    .fetchAll();
+  assert.deepStrictEqual(resources, [
+    { id: "id2", sortKey1: "a", sortKey2: "b" },
+    { id: "id1", sortKey1: "a", sortKey2: "a" },
+    { id: "id4", sortKey1: "b", sortKey2: "b" },
+    { id: "id3", sortKey1: "b", sortKey2: "a" }
+  ]);
+});
+
+export const queryWithMultipleOrderByFailsWhenNoCompositeIndexes = withTestEnv(
+  async client => {
+    const { database } = await client.databases.create({ id: "test-database" });
+    const { container } = await database.containers.create({
+      id: "test-container"
+    });
+    try {
+      await container.items
+        .query("SELECT * FROM c ORDER BY c.sortKey1, c.sortKey2")
+        .fetchAll();
+      assert.fail();
+    } catch (err) {
+      assert.strictEqual(err.code, 400);
+    }
+  }
+);
+
+export const queryWithInvalidMultipleOrderByFails = withTestEnv(
+  async client => {
+    const { database } = await client.databases.create({ id: "test-database" });
+    const { container } = await database.containers.create({
+      id: "test-container",
+      indexingPolicy: {
+        compositeIndexes: [
+          [
+            {
+              path: "/sortKey1"
+            },
+            {
+              path: "/sortKey2",
+              order: "descending"
+            }
+          ]
+        ]
+      }
+    });
+    try {
+      await container.items
+        .query("SELECT * FROM c ORDER BY c.sortKey1, c.sortKey2")
+        .fetchAll();
+      assert.fail();
+    } catch (err) {
+      assert.strictEqual(err.code, 400);
+    }
+  }
+);
