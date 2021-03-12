@@ -1479,10 +1479,10 @@
     signal-exit "3.0.2"
     strip-ansi "^5.0.0"
 
-"@zeit/cosmosdb-query@0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@zeit/cosmosdb-query/-/cosmosdb-query-0.7.0.tgz#ed7963a8035c18257827cf2a5ab2e69377772705"
-  integrity sha512-u3+kPF4Y2IDe7uQsiNI6bJ/wIwUDa/wSxNuycou5pkbZ5DDH4lT9aHtOPOYLZSdpM57i3JxGk9H118DhOhEdQA==
+"@zeit/cosmosdb-query@0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@zeit/cosmosdb-query/-/cosmosdb-query-0.7.1.tgz#8d238a1e59a5323be75989832eaa87cd65df7a7d"
+  integrity sha512-3dG7IGBy77cs7nb1Bu2Y1frBQP+mRiDpZ6aC8vEmDjytqlXIITF70QGVy1Pfvi3rzV2Cq2EZh0PZiHzCP7H/DA==
   dependencies:
     "@babel/generator" "7.6.2"
     "@babel/traverse" "7.6.2"
