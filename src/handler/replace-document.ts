@@ -1,7 +1,10 @@
 import * as http from "http";
+import { replaceOperation } from "./_document-operations";
 import Account from "../account";
 import json from "../json";
-import getPartitionFromHeader from "../utils/get-partition-from-header";
+import getPartitionFromHeader, {
+  parsePartitionKey
+} from "../utils/get-partition-from-header";
 
 export default async (
   account: Account,
@@ -18,40 +21,21 @@ export default async (
   }
 ) => {
   const body = await json(req);
-  if (!body.id) {
-    res.statusCode = 400;
-    return { message: "missing id" };
-  }
-
   const collection = account.database(dbId).collection(collId);
-  const data = collection
-    .document(docId, getPartitionFromHeader(req, docId))
-    .read();
+
+  const partitionKey = getPartitionFromHeader(req);
+  const parsedPartitionKey = parsePartitionKey(partitionKey, docId);
+  const data = collection.document(docId, parsedPartitionKey).read();
   if (!data) {
     res.statusCode = 404;
     return {};
   }
 
-  if (req.headers["if-match"] && req.headers["if-match"] !== data._etag) {
-    res.statusCode = 412;
-    return {
-      code: "PreconditionFailed",
-      message:
-        "Operation cannot be performed because one of the specified precondition is not met."
-    };
-  }
-
-  try {
-    return await collection.documents.replace(body, data);
-  } catch (error) {
-    if (error.badRequest) {
-      res.statusCode = 400;
-      return { code: "BadRequest", message: error.message };
-    }
-    if (error.conflict) {
-      res.statusCode = 409;
-      return { message: error.message, code: "Conflict" };
-    }
-    throw error;
-  }
+  const result = replaceOperation(collection, {
+    partitionKey,
+    ifMatch: req.headers["if-match"],
+    resourceBody: body
+  });
+  res.statusCode = result.statusCode;
+  return result.body;
 };

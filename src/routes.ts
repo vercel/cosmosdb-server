@@ -1,3 +1,4 @@
+import batchDocuments from "./handler/batch-documents";
 import createCollection from "./handler/create-collection";
 import createDatabase from "./handler/create-database";
 import createDocument from "./handler/create-document";
@@ -61,6 +62,9 @@ export default router({
     "/dbs/:dbId/colls/:collId/udfs": queryUserDefinedFunctions,
     "/dbs/:dbId/colls": queryCollections,
     "/dbs": queryDatabases
+  },
+  POST_BATCH: {
+    "/dbs/:dbId/colls/:collId/docs": batchDocuments
   },
   PUT: {
     "/dbs/:dbId/colls/:collId/docs/:docId": replaceDocument,

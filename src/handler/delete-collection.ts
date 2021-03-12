@@ -1,6 +1,5 @@
 import * as http from "http";
 import Account from "../account";
-import getPartitionFromHeader from "../utils/get-partition-from-header";
 
 export default (
   account: Account,
@@ -21,8 +20,5 @@ export default (
   }
 
   res.statusCode = 204;
-  return database.collections.delete(
-    collId,
-    getPartitionFromHeader(req, collId)
-  );
+  return database.collections.delete(collId, collId);
 };

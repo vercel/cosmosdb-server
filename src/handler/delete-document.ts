@@ -1,4 +1,5 @@
 import * as http from "http";
+import { deleteOperation } from "./_document-operations";
 import Account from "../account";
 import getPartitionFromHeader from "../utils/get-partition-from-header";
 
@@ -17,22 +18,13 @@ export default (
   }
 ) => {
   const collection = account.database(dbId).collection(collId);
-  const partition = getPartitionFromHeader(req, docId);
-  const data = collection.document(docId, partition).read();
-  if (!data) {
-    res.statusCode = 404;
-    return {};
-  }
+  const partitionKey = getPartitionFromHeader(req);
 
-  if (req.headers["if-match"] && req.headers["if-match"] !== data._etag) {
-    res.statusCode = 412;
-    return {
-      code: "PreconditionFailed",
-      message:
-        "Operation cannot be performed because one of the specified precondition is not met."
-    };
-  }
+  const result = deleteOperation(collection, {
+    partitionKey,
+    ifMatch: req.headers["if-match"],
+    id: docId
+  });
 
-  res.statusCode = 204;
-  return collection.documents.delete(docId, partition);
+  res.statusCode = result.statusCode;
 };
