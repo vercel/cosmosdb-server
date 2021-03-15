@@ -27,4 +27,5 @@ export default (
   });
 
   res.statusCode = result.statusCode;
+  return result.body;
 };

@@ -105,6 +105,20 @@ export const deleteDatabase = withTestEnv(async client => {
   assert.strictEqual(result.statusCode, 204);
 });
 
+export const deleteDocument404 = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "test-database" });
+  const { container } = await database.containers.create({
+    id: "test-collection"
+  });
+  const item = container.item("test-item");
+
+  try {
+    await item.delete();
+  } catch (err) {
+    assert.strictEqual(err.code, 404);
+  }
+});
+
 export const querySyntaxError = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
