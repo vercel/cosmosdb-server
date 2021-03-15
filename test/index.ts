@@ -114,6 +114,7 @@ export const deleteDocument404 = withTestEnv(async client => {
 
   try {
     await item.delete();
+    assert.fail();
   } catch (err) {
     assert.strictEqual(err.code, 404);
   }
