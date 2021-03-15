@@ -29,6 +29,8 @@ export default (rules: { [x: string]: { [y: string]: Function } }) => {
       method += "_QUERY";
     } else if (trueHeader(req, "x-ms-documentdb-is-upsert")) {
       method += "_UPSERT";
+    } else if (trueHeader(req, "x-ms-cosmos-is-batch-request")) {
+      method += "_BATCH";
     }
 
     const methodRoutes = routes[method] || [];

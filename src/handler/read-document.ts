@@ -1,8 +1,11 @@
 import * as http from "http";
+import { readOperation } from "./_document-operations";
 import Account from "../account";
 import ItemObject from "../account/item-object";
 import trueHeader from "../true-header";
-import getPartitionFromHeader from "../utils/get-partition-from-header";
+import getPartitionFromHeader, {
+  parsePartitionKey
+} from "../utils/get-partition-from-header";
 
 /**
  * Given a collection configuration this filters out _partitionKey which
@@ -50,13 +53,8 @@ export default (
     docId: string;
   }
 ) => {
-  const data = account
-    .database(dbId)
-    .collection(collId)
-    .document(docId, getPartitionFromHeader(req, docId))
-    .read();
-
-  if (!data) {
+  const collection = account.database(dbId).collection(collId);
+  if (!collection.read()) {
     res.statusCode = 404;
     return {
       code: "NotFound",
@@ -64,21 +62,10 @@ export default (
     };
   }
 
+  const partitionKey = getPartitionFromHeader(req);
+
   if (!trueHeader(req, "x-ms-documentdb-query-enablecrosspartition")) {
-    const collection = account
-      .database(dbId)
-      .collection(collId)
-      .read();
-
-    if (!collection) {
-      res.statusCode = 404;
-      return {
-        code: "NotFound",
-        message: "Entity with the specified id does not exist in the system.,"
-      };
-    }
-
-    const collectionKeys = getCollectionPartitionKeys(collection);
+    const collectionKeys = getCollectionPartitionKeys(collection.read());
     const clientKeys = getClientPartitionKeys(req.headers);
 
     if (collectionKeys.length > clientKeys.length) {
@@ -89,6 +76,9 @@ export default (
           "The partition key supplied in x-ms-partitionkey header has fewer components than defined in the collection"
       };
     }
+
+    const parsedPartitionKey = parsePartitionKey(partitionKey, docId);
+    const data = collection.document(docId, parsedPartitionKey).read();
 
     for (let i = 0; i <= collectionKeys.length; i += 1) {
       const path = collectionKeys[i] as keyof typeof data;
@@ -102,5 +92,7 @@ export default (
     }
   }
 
-  return data;
+  const result = readOperation(collection, { partitionKey, id: docId });
+  res.statusCode = result.statusCode;
+  return result.body;
 };

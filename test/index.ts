@@ -1,3 +1,4 @@
+import { BulkOperationType } from "@azure/cosmos";
 import assert from "assert";
 import withCosmosDB from "./with-cosmosdb";
 
@@ -232,3 +233,137 @@ export const queryWithInvalidMultipleOrderByFails = withTestEnv(
     }
   }
 );
+
+export const bulkApi = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "test-database" });
+  const { container } = await database.containers.create({
+    id: "test-container",
+    partitionKey: {
+      paths: ["/key"]
+    }
+  });
+
+  await container.items.create({
+    id: "item1",
+    key: "A",
+    class: "2010"
+  });
+  await container.items.create({
+    id: "item2",
+    key: "A",
+    class: "2010"
+  });
+  await container.items.create({
+    id: "item3",
+    key: 5,
+    class: "2010"
+  });
+
+  const operations = [
+    {
+      operationType: BulkOperationType.Create,
+      resourceBody: { id: "doc1", name: "sample", key: "A" }
+    },
+    {
+      operationType: BulkOperationType.Upsert,
+      partitionKey: "A",
+      resourceBody: { id: "doc2", name: "other", key: "A" }
+    },
+    {
+      operationType: BulkOperationType.Read,
+      id: "item1",
+      partitionKey: "A"
+    },
+    {
+      operationType: BulkOperationType.Delete,
+      id: "item2",
+      partitionKey: "A"
+    },
+    {
+      operationType: BulkOperationType.Replace,
+      partitionKey: 5,
+      id: "item3",
+      resourceBody: { id: "item3", name: "nice", key: 5 }
+    }
+  ];
+
+  const response = await container.items.bulk(operations);
+
+  // Create
+  assert.equal(response[0].resourceBody.name, "sample");
+  assert.equal(response[0].statusCode, 201);
+  assert(response[0].requestCharge > 0);
+  assert(response[0].eTag);
+  // Upsert
+  assert.equal(response[1].resourceBody.name, "other");
+  assert.equal(response[1].statusCode, 201);
+  assert(response[1].requestCharge > 0);
+  assert(response[1].eTag);
+  // Read
+  assert.equal(response[2].resourceBody.class, "2010");
+  assert.equal(response[2].statusCode, 200);
+  assert(response[2].requestCharge > 0);
+  assert(response[2].eTag);
+  // Delete
+  assert.equal(response[3].statusCode, 204);
+  assert(response[3].requestCharge > 0);
+  assert(!response[3].eTag);
+  // Replace
+  assert.equal(response[4].resourceBody.name, "nice");
+  assert.equal(response[4].statusCode, 200);
+  assert(response[4].requestCharge > 0);
+  assert(response[4].eTag);
+});
+
+export const bulkApiDoNotContinueOnError = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "test-database" });
+  const { container } = await database.containers.create({
+    id: "test-container",
+    partitionKey: {
+      paths: ["/key"]
+    }
+  });
+
+  await container.items.create({
+    id: "item1",
+    key: "A"
+  });
+  await container.items.create({
+    id: "item2",
+    key: "A"
+  });
+
+  const operations = [
+    {
+      operationType: BulkOperationType.Create,
+      resourceBody: { id: "item3", key: "A" }
+    },
+    {
+      operationType: BulkOperationType.Read,
+      id: "item1",
+      partitionKey: "A"
+    },
+    {
+      operationType: BulkOperationType.Read,
+      id: "not-exist",
+      partitionKey: "A"
+    },
+    {
+      operationType: BulkOperationType.Create,
+      resourceBody: { id: "item4", key: "A" }
+    },
+    {
+      operationType: BulkOperationType.Read,
+      id: "item2",
+      partitionKey: "A"
+    }
+  ];
+
+  const response = await container.items.bulk(operations);
+
+  assert.equal(response[0].statusCode, 201);
+  assert.equal(response[1].statusCode, 200);
+  assert.equal(response[2].statusCode, 404);
+  assert.equal(response[3].statusCode, 424);
+  assert.equal(response[4].statusCode, 424);
+});

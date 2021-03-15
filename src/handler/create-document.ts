@@ -1,4 +1,5 @@
 import * as http from "http";
+import { createOperation } from "./_document-operations";
 import Account from "../account";
 import json from "../json";
 
@@ -15,26 +16,8 @@ export default async (
   }
 ) => {
   const body = await json(req);
-  if (!body.id) {
-    res.statusCode = 400;
-    return { message: "missing id" };
-  }
-
   const collection = account.database(dbId).collection(collId);
-  if (!collection.read()) {
-    res.statusCode = 404;
-    return {};
-  }
-
-  res.statusCode = 201;
-  try {
-    return collection.documents.create(body);
-  } catch (err) {
-    if (err.conflict) {
-      res.statusCode = 409;
-      return { code: "Conflict", message: err.message };
-    }
-
-    throw err;
-  }
+  const result = createOperation(collection, { resourceBody: body });
+  res.statusCode = result.statusCode;
+  return result.body;
 };
