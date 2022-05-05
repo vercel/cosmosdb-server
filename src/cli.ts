@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 import * as net from "net";
-import cosmosDBServer from ".";
+import { createHttpServer, createHttpsServer } from ".";
 
 const argv = process.argv.slice(2);
-const args: { help?: boolean; port?: number; hostname?: string } = {};
+const args: {
+  help?: boolean;
+  port?: number;
+  hostname?: string;
+  nossl?: boolean;
+} = {};
 while (argv.length) {
   const key = argv.shift();
   switch (key) {
@@ -17,6 +22,9 @@ while (argv.length) {
       break;
     case "--host":
       args.hostname = argv.shift();
+      break;
+    case "--no-ssl":
+      args.nossl = true;
       break;
     default:
       break;
@@ -32,11 +40,13 @@ Options:
 
   -h, --help
   -p, --port
+  --no-ssl
   --host
 `);
   process.exit();
 }
 
+const cosmosDBServer = args.nossl ? createHttpServer : createHttpsServer;
 const server = cosmosDBServer().listen(args.port, args.hostname, () => {
   const { address, family, port } = server.address() as net.AddressInfo;
   // eslint-disable-next-line no-nested-ternary
@@ -46,5 +56,9 @@ const server = cosmosDBServer().listen(args.port, args.hostname, () => {
     ? `[${address}]`
     : address;
   // eslint-disable-next-line no-console
-  console.log(`Ready to accept connections at ${hostname}:${port}`);
+  console.log(
+    `Ready to accept HTTP${
+      args.nossl ? "" : "S"
+    } connections at ${hostname}:${port}`
+  );
 });

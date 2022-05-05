@@ -31,10 +31,22 @@ async function runClient() {
 }
 ```
 
+To choose between listening for HTTP and HTTPS, import the right function.
+
+```js
+const { createHttpServer, createHttpsServer } = require("@zeit/cosmosdb-server"); 
+```
+
 To run the server on cli:
 
 ```sh
 cosmosdb-server -p 3000
+```
+
+or without SSL:
+
+```sh
+cosmosdb-server -p 3000 --no-ssl
 ```
 
 ## installation
