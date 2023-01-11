@@ -10,6 +10,7 @@ import deleteUserDefinedFunction from "./handler/delete-user-defined-function";
 import queryCollections from "./handler/query-collections";
 import queryDatabases from "./handler/query-databases";
 import queryDocuments from "./handler/query-documents";
+import queryPlanDocuments from "./handler/query-plan-documents"
 import queryUserDefinedFunctions from "./handler/query-user-defined-functions";
 import readCollection from "./handler/read-collection";
 import readCollections from "./handler/read-collections";
@@ -62,6 +63,9 @@ export default router({
     "/dbs/:dbId/colls/:collId/udfs": queryUserDefinedFunctions,
     "/dbs/:dbId/colls": queryCollections,
     "/dbs": queryDatabases
+  },
+  POST_QUERYPLAN: {
+    "/dbs/:dbId/colls/:collId/docs": queryPlanDocuments
   },
   POST_BATCH: {
     "/dbs/:dbId/colls/:collId/docs": batchDocuments
