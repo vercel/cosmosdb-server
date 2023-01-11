@@ -4,8 +4,9 @@ import Item from "./item";
 
 export default class Account extends Item {
   databases: Databases;
+  ssl: boolean;
 
-  constructor(host: string, port: number) {
+  constructor(host: string, port: number, ssl: boolean) {
     super({
       _rid: host,
       _self: "",
@@ -16,13 +17,13 @@ export default class Account extends Item {
       writableLocations: [
         {
           name: "South Central US",
-          databaseAccountEndpoint: `https://${host}:${port}/`
+          databaseAccountEndpoint: `http${ssl ? "s" : ""}://${host}:${port}/`
         }
       ],
       readableLocations: [
         {
           name: "South Central US",
-          databaseAccountEndpoint: `https://${host}:${port}/`
+          databaseAccountEndpoint: `http${ssl ? "s" : ""}://${host}:${port}/`
         }
       ],
       enableMultipleWriteLocations: false,
@@ -45,7 +46,15 @@ export default class Account extends Item {
       queryEngineConfiguration:
         '{"maxSqlQueryInputLength":262144,"maxJoinsPerSqlQuery":5,"maxLogicalAndPerSqlQuery":500,"maxLogicalOrPerSqlQuery":500,"maxUdfRefPerSqlQuery":10,"maxInExpressionItemsCount":16000,"queryMaxInMemorySortDocumentCount":500,"maxQueryRequestTimeoutFraction":0.9,"sqlAllowNonFiniteNumbers":false,"sqlAllowAggregateFunctions":true,"sqlAllowSubQuery":true,"sqlAllowScalarSubQuery":true,"allowNewKeywords":true,"sqlAllowLike":false,"maxSpatialQueryCells":12,"spatialMaxGeometryPointCount":256,"sqlAllowTop":true,"enableSpatialIndexing":true}'
     });
+    this.ssl = ssl;
     this.databases = new Databases(this, ["/id"]);
+  }
+
+  updateHostName(host: string){
+    //when running this server in a dockerized environment, the hostname becomes the servername
+    //and databaseAccountEndpoint needs to point to the hostname provided by the caller
+    this._data.writableLocations[0].databaseAccountEndpoint = `http${this.ssl ? "s" : ""}://${host}/`;
+    this._data.readableLocations[0].databaseAccountEndpoint = `http${this.ssl ? "s" : ""}://${host}/`;
   }
 
   database(idOrRid: string) {
