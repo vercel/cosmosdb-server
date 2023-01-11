@@ -51,8 +51,8 @@ export default class Account extends Item {
   }
 
   updateHostName(host: string){
-    //when running this server in a dockerized environment, the hostname becomes the servername
-    //and databaseAccountEndpoint needs to point to the hostname provided by the caller
+    // when running this server in a dockerized environment, the hostname becomes the servername
+    // and databaseAccountEndpoint needs to point to the hostname provided by the caller
     this._data.writableLocations[0].databaseAccountEndpoint = `http${this.ssl ? "s" : ""}://${host}/`;
     this._data.readableLocations[0].databaseAccountEndpoint = `http${this.ssl ? "s" : ""}://${host}/`;
   }
