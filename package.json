@@ -38,7 +38,7 @@
     "@azure/cosmos": "3.10.2",
     "@babel/core": "7.6.2",
     "@types/lru-cache": "5.1.0",
-    "@types/node": "12.7.9",
+    "@types/node": "^16.0.0",
     "@types/uuid": "3.4.5",
     "@typescript-eslint/eslint-plugin": "2.3.2",
     "@typescript-eslint/parser": "2.3.2",
