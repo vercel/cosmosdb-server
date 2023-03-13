@@ -40,8 +40,8 @@
     "@types/lru-cache": "5.1.0",
     "@types/node": "^16.0.0",
     "@types/uuid": "3.4.5",
-    "@typescript-eslint/eslint-plugin": "2.3.2",
-    "@typescript-eslint/parser": "2.3.2",
+    "@typescript-eslint/eslint-plugin": "3.10.1",
+    "@typescript-eslint/parser": "3.10.1",
     "@zeit/best": "0.5.3",
     "@zeit/git-hooks": "0.1.4",
     "eslint": "6.5.1",
@@ -52,7 +52,7 @@
     "eslint-plugin-react": "7.15.1",
     "prettier": "1.18.2",
     "ts-node": "8.4.1",
-    "typescript": "3.6.3"
+    "typescript": "4.9.5"
   },
   "eslintConfig": {
     "extends": [
