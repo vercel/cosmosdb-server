@@ -1,11 +1,11 @@
 {
-  "name": "@zeit/cosmosdb-server",
+  "name": "@vercel/cosmosdb-server",
   "version": "0.14.0",
   "description": "A Cosmos DB server implementation",
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "repository": "github:zeit/cosmosdb-server",
+  "repository": "github:vercel/cosmosdb-server",
   "files": [
     "cert.pem",
     "key.pem",
