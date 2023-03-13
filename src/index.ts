@@ -8,7 +8,15 @@ import uuid from "uuid/v4";
 import Account from "./account";
 import routes from "./routes";
 
-const handleRequest = (
+const generateRequestHandler = ({
+  keepAlive = false
+}: {
+  /**
+   * If set to `true` adds `Connection: keep-alive` header, otherwise uses
+   * `Connection: close`.
+   */
+  keepAlive?: boolean | undefined;
+}) => (
   account: Account,
   req: http.IncomingMessage,
   res: http.ServerResponse
@@ -41,7 +49,7 @@ const handleRequest = (
 
     res.setHeader("content-type", "application/json");
     res.setHeader("content-location", `https://${req.headers.host}${req.url}`);
-    res.setHeader("connection", "close");
+    res.setHeader("connection", keepAlive ? "keep-alive" : "close");
     res.setHeader("x-ms-activity-id", uuid());
     res.setHeader("x-ms-request-charge", "1");
     if (req.headers["x-ms-documentdb-populatequerymetrics"]) {
@@ -79,9 +87,12 @@ const createAccount = (address: string | net.AddressInfo) => {
   return new Account(hostname, port);
 };
 
-export function createHttpServer(opts?: http.ServerOptions) {
+export function createHttpServer(opts: http.ServerOptions = {}) {
   let account: Account | undefined;
 
+  const handleRequest = generateRequestHandler({
+    keepAlive: opts.keepAlive
+  });
   const server = http
     .createServer(opts, (req, res) => {
       handleRequest(account, req, res);
@@ -105,6 +116,9 @@ export function createHttpsServer(opts?: https.ServerOptions) {
     ...opts
   };
 
+  const handleRequest = generateRequestHandler({
+    keepAlive: options.keepAlive
+  });
   const server = https
     .createServer(options, (req, res) => {
       handleRequest(account, req, res);
