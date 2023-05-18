@@ -4,7 +4,7 @@ import * as https from "https";
 import * as net from "net";
 import { join } from "path";
 import * as tls from "tls";
-import uuid from "uuid/v4";
+import { randomUUID } from "crypto";
 import Account from "./account";
 import routes from "./routes";
 
@@ -50,7 +50,7 @@ const generateRequestHandler = ({
     res.setHeader("content-type", "application/json");
     res.setHeader("content-location", `https://${req.headers.host}${req.url}`);
     res.setHeader("connection", keepAlive ? "keep-alive" : "close");
-    res.setHeader("x-ms-activity-id", uuid());
+    res.setHeader("x-ms-activity-id", randomUUID());
     res.setHeader("x-ms-request-charge", "1");
     if (req.headers["x-ms-documentdb-populatequerymetrics"]) {
       res.setHeader(
