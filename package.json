@@ -94,5 +94,8 @@
       "lint-staged",
       "format-staged"
     ]
+  },
+  "engines": {
+    "node": ">=14.17"
   }
 }
