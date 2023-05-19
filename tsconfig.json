@@ -5,10 +5,7 @@
     "module": "CommonJS",
     "noImplicitAny": true,
     "outDir": "lib",
-    "target": "es2019",
-    "typeRoots": ["./src/@types"]
+    "target": "es2019"
   },
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }
