@@ -2,5 +2,6 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  testPathIgnorePatterns: ["/node_modules/", "/azure-sdk-for-js/"]
+  testPathIgnorePatterns: ["/node_modules/", "/azure-sdk-for-js/"],
+  modulePathIgnorePatterns: ["/node_modules/", "/azure-sdk-for-js/"]
 };

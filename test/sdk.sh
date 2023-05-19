@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+## This script is used to build the Azure SDK and run their integration tests
+# against our cosmosdb server.
+#
+# This is done to ensure we maintain compatibility with the Azure SDK.
+#
+# Note that the `azure-sdk-for-js` is a git submodule of this repo, and we install `rush`, as that is the
+# tool they use to manage their monorepo.
 set -euo pipefail
 
 readonly port="$((RANDOM + 3000))"
@@ -6,20 +13,14 @@ trap 'kill -9 $pid' EXIT
 ts-node ./src/cli.ts -p "$port" &
 pid=$!
 
-cd test/azure-sdk-for-js/common/tools/eslint-plugin-azure-sdk
-npm link
-cd -
-
-cd test/azure-sdk-for-js/common/tools/dev-tool
-npm link @azure/eslint-plugin-azure-sdk
-npm link
-cd -
-
-cd test/azure-sdk-for-js/sdk/cosmosdb/cosmos
-npm link @azure/dev-tool
-npm link @azure/eslint-plugin-azure-sdk
-npm install --no-package-lock
-npm run build:test
+cd test/azure-sdk-for-js
+npm i -g @microsoft/rush
+rush update
+cd sdk/cosmosdb/cosmos
+# Override their `tsconfig` to prevent it picking up type definitions from our node_modules (which is a parent dir).
+mv tsconfig.json tsconfig.json.bak
+cat tsconfig.json.bak | jq '. * { "compilerOptions": { "typeRoots": ["./node_modules/@types/"] }}' > tsconfig.json
+rush build:test -f .
 
 ACCOUNT_HOST="https://localhost:$port" npm run integration-test:node -- --i --exit \
   -g 'Authorization|http proxy|Change Feed|Partition|indexing|Offer CRUD|Parallel Query As String|Permission|Query Metrics On Single Partition Collection|ResourceLink Trimming|Session Token|spatial|sproc|stored procedure|Trigger|trigger|TTL|User|Non Partitioned|Validate SSL verification|matching constant version & package version|Conflicts|Partition|GROUP BY|.readOffer|autoscale|with v2 container'
