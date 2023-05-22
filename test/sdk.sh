@@ -15,7 +15,7 @@ pid=$!
 
 cd test/azure-sdk-for-js
 npm i -g @microsoft/rush
-rush update
+CI=false rush install
 
 # Override all `tsconfig.json` to prevent it picking up type definitions from our
 # node_modules (which is a parent dir).
@@ -29,5 +29,7 @@ done
 cd sdk/cosmosdb/cosmos
 rush build:test -f .
 
-ACCOUNT_HOST="https://localhost:$port" npm run integration-test:node -- --i --exit \
--g 'Authorization|http proxy|Change Feed|Partition|indexing|Offer CRUD|Parallel Query As String|Permission|Query Metrics On Single Partition Collection|ResourceLink Trimming|Session Token|spatial|sproc|stored procedure|Trigger|trigger|TTL|User|Non Partitioned|Validate SSL verification|matching constant version & package version|Conflicts|Partition|GROUP BY|.readOffer|autoscale|with v2 container'
+git reset --hard
+
+ACCOUNT_HOST="https://localhost:$port" npm run integration-test:node -- -i --exit \
+  -g 'Authorization|http proxy|Change Feed|Partition|indexing|Offer CRUD|Parallel Query As String|Permission|Query Metrics On Single Partition Collection|ResourceLink Trimming|Session Token|spatial|sproc|stored procedure|Trigger|trigger|TTL|User|Non Partitioned|Validate SSL verification|matching constant version & package version|Conflicts|Partition|GROUP BY|.readOffer|autoscale|with v2 container'
