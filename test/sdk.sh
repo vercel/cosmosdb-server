@@ -15,7 +15,7 @@ pid=$!
 
 cd test/azure-sdk-for-js
 npm i -g @microsoft/rush
-CI=false rush install
+rush install
 
 # Override all `tsconfig.json` to prevent it picking up type definitions from our
 # node_modules (which is a parent dir).
@@ -27,7 +27,7 @@ for f in $(find . -name tsconfig.json | grep -v node_modules); do
 done
 
 cd sdk/cosmosdb/cosmos
-rush build:test -f .
+rush build:test -t .
 
 git reset --hard
 
