@@ -15,7 +15,7 @@ pid=$!
 
 cd test/azure-sdk-for-js
 npm i -g @microsoft/rush
-rush install
+rush install || rush install # try twice, the first seems to fail for no reason, but then it works
 
 # Override all `tsconfig.json` to prevent it picking up type definitions from our
 # node_modules (which is a parent dir).
