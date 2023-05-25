@@ -1,11 +1,5 @@
-name: Build, Test, and Publish
-
+name: Build & Test
 on:
-  push:
-    branches:
-      - main
-    tags:
-
   pull_request:
 
 jobs:
@@ -26,22 +20,7 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Lint
         run: yarn lint
+      - name: Build
+        run: yarn build
       - name: Test
         run: yarn test
-
-  publish:
-    # Only run when a new tag is published
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: quality
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-          cache: "yarn"
-      - name: Install Dependencies
-        run: yarn install --frozen-lockfile
-      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
-      - name: Publish
-        run: npm publish --access public --unsafe-perm
