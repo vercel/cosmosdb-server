@@ -1,7 +1,6 @@
 import Collection from "../account/collection";
 import { parsePartitionKey } from "../utils/get-partition-from-header";
 import {
-  BulkOperationType,
   CreateOperationInput,
   DeleteOperationInput,
   JSONObject,
