@@ -4,6 +4,7 @@ import readItems from "./_read-items";
 import Account from "../account";
 import json from "../json";
 import trueHeader from "../true-header";
+import getPartitionFromHeader from "../utils/get-partition-from-header";
 
 export default async (
   account: Account,
@@ -29,7 +30,7 @@ export default async (
     if (!trueHeader(req, "x-ms-documentdb-query-enablecrosspartition")) {
       const { partitionKey }: { partitionKey?: any } = collection.read() || {};
       const paths = (partitionKey || {}).paths || [];
-      if (paths.length && !query(body.query).containsPartitionKeys(paths)) {
+      if (paths.length && !query(body.query).containsPartitionKeys(paths) && !getPartitionFromHeader(req)) {
         res.statusCode = 400;
         return { message: "missing partition keys" };
       }
