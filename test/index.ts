@@ -8,7 +8,7 @@ function withTestEnv(fn: (x0: { [x: string]: any }) => any) {
   return withCosmosDB(fn);
 }
 
-const readDocument404 = withTestEnv(async client => {
+export const readDocument404 = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-collection"
@@ -20,7 +20,7 @@ const readDocument404 = withTestEnv(async client => {
   assert.strictEqual(statusCode, 404);
 });
 
-const upsertDocument = withTestEnv(async client => {
+export const upsertDocument = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-collection"
@@ -33,7 +33,7 @@ const upsertDocument = withTestEnv(async client => {
   assert(resource._etag);
 });
 
-const upsertDocumentUpdate = withTestEnv(async client => {
+export const upsertDocumentUpdate = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-collection"
@@ -46,7 +46,7 @@ const upsertDocumentUpdate = withTestEnv(async client => {
   assert(resource._etag);
 });
 
-const readDocumentsEmpty = withTestEnv(async client => {
+export const readDocumentsEmpty = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-collection"
@@ -55,7 +55,7 @@ const readDocumentsEmpty = withTestEnv(async client => {
   assert.deepStrictEqual(resources, []);
 });
 
-const readDocuments = withTestEnv(async client => {
+export const readDocuments = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-collection"
@@ -80,7 +80,7 @@ const readDocuments = withTestEnv(async client => {
   }
 });
 
-const udf = withTestEnv(async client => {
+export const udf = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-collection"
@@ -99,13 +99,13 @@ const udf = withTestEnv(async client => {
   assert.deepStrictEqual(resources, [true]);
 });
 
-const deleteDatabase = withTestEnv(async client => {
+export const deleteDatabase = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const result = await database.delete();
   assert.strictEqual(result.statusCode, 204);
 });
 
-const deleteDocument404 = withTestEnv(async client => {
+export const deleteDocument404 = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-collection"
@@ -120,7 +120,7 @@ const deleteDocument404 = withTestEnv(async client => {
   }
 });
 
-const querySyntaxError = withTestEnv(async client => {
+export const querySyntaxError = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-container"
@@ -133,34 +133,36 @@ const querySyntaxError = withTestEnv(async client => {
   }
 });
 
-const failsToCreateInvalidCompositeIndexes = withTestEnv(async client => {
-  const { database } = await client.databases.create({ id: "test-database" });
-  const params = {
-    id: "test-container",
-    indexingPolicy: {
-      compositeIndexes: [
-        [
-          {
-            path: "/sortKey1",
-            order: "invalid"
-          },
-          {
-            path: "/sortKey2",
-            order: "descending"
-          }
+export const failsToCreateInvalidCompositeIndexes = withTestEnv(
+  async client => {
+    const { database } = await client.databases.create({ id: "test-database" });
+    const params = {
+      id: "test-container",
+      indexingPolicy: {
+        compositeIndexes: [
+          [
+            {
+              path: "/sortKey1",
+              order: "invalid"
+            },
+            {
+              path: "/sortKey2",
+              order: "descending"
+            }
+          ]
         ]
-      ]
+      }
+    };
+    try {
+      await database.containers.create(params);
+      assert.fail();
+    } catch (err) {
+      assert.strictEqual(err.code, 400);
     }
-  };
-  try {
-    await database.containers.create(params);
-    assert.fail();
-  } catch (err) {
-    assert.strictEqual(err.code, 400);
   }
-});
+);
 
-const queryWithMultipleOrderBy = withTestEnv(async client => {
+export const queryWithMultipleOrderBy = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-container",
@@ -200,7 +202,7 @@ const queryWithMultipleOrderBy = withTestEnv(async client => {
   ]);
 });
 
-const queryWithMultipleOrderByFailsWhenNoCompositeIndexes = withTestEnv(
+export const queryWithMultipleOrderByFailsWhenNoCompositeIndexes = withTestEnv(
   async client => {
     const { database } = await client.databases.create({ id: "test-database" });
     const { container } = await database.containers.create({
@@ -217,35 +219,37 @@ const queryWithMultipleOrderByFailsWhenNoCompositeIndexes = withTestEnv(
   }
 );
 
-const queryWithInvalidMultipleOrderByFails = withTestEnv(async client => {
-  const { database } = await client.databases.create({ id: "test-database" });
-  const { container } = await database.containers.create({
-    id: "test-container",
-    indexingPolicy: {
-      compositeIndexes: [
-        [
-          {
-            path: "/sortKey1"
-          },
-          {
-            path: "/sortKey2",
-            order: "descending"
-          }
+export const queryWithInvalidMultipleOrderByFails = withTestEnv(
+  async client => {
+    const { database } = await client.databases.create({ id: "test-database" });
+    const { container } = await database.containers.create({
+      id: "test-container",
+      indexingPolicy: {
+        compositeIndexes: [
+          [
+            {
+              path: "/sortKey1"
+            },
+            {
+              path: "/sortKey2",
+              order: "descending"
+            }
+          ]
         ]
-      ]
+      }
+    });
+    try {
+      await container.items
+        .query("SELECT * FROM c ORDER BY c.sortKey1, c.sortKey2")
+        .fetchAll();
+      assert.fail();
+    } catch (err) {
+      assert.strictEqual(err.code, 400);
     }
-  });
-  try {
-    await container.items
-      .query("SELECT * FROM c ORDER BY c.sortKey1, c.sortKey2")
-      .fetchAll();
-    assert.fail();
-  } catch (err) {
-    assert.strictEqual(err.code, 400);
   }
-});
+);
 
-const bulkApi = withTestEnv(async client => {
+export const bulkApi = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-container",
@@ -326,7 +330,7 @@ const bulkApi = withTestEnv(async client => {
   assert(response[4].eTag);
 });
 
-const bulkApiDoNotContinueOnError = withTestEnv(async client => {
+export const bulkApiDoNotContinueOnError = withTestEnv(async client => {
   const { database } = await client.databases.create({ id: "test-database" });
   const { container } = await database.containers.create({
     id: "test-container",
@@ -377,31 +381,4 @@ const bulkApiDoNotContinueOnError = withTestEnv(async client => {
   assert.equal(response[2].statusCode, 404);
   assert.equal(response[3].statusCode, 424);
   assert.equal(response[4].statusCode, 424);
-});
-
-describe("CosmosDB", () => {
-  it("read document 404", readDocument404);
-  it("upsert document", upsertDocument);
-  it("upsert document update", upsertDocumentUpdate);
-  it("read documents empty", readDocumentsEmpty);
-  it("read documents", readDocuments);
-  it("udf", udf);
-  it("delete database", deleteDatabase);
-  it("delete document 404", deleteDocument404);
-  it("query syntax error", querySyntaxError);
-  it(
-    "fails to create invalid composite indexes",
-    failsToCreateInvalidCompositeIndexes
-  );
-  it(
-    "queryWithInvalidMultipleOrderByFails",
-    queryWithInvalidMultipleOrderByFails
-  );
-  it("queryWithMultipleOrderBy", queryWithMultipleOrderBy);
-  it(
-    "queryWithMultipleOrderByFailsWhenNoCompositeIndexes",
-    queryWithMultipleOrderByFailsWhenNoCompositeIndexes
-  );
-  it("bulkApi", bulkApi);
-  it("bulkApiDoNotContinueOnError", bulkApiDoNotContinueOnError);
 });

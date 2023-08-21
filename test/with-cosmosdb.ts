@@ -6,7 +6,7 @@ import cosmosDBServer from "../src";
 export default function withCosmosDBServer(fn: (...args: any[]) => any) {
   return async (...args: any[]) => {
     const server = cosmosDBServer();
-    await new Promise<void>(resolve => {
+    await new Promise(resolve => {
       server.listen(0, resolve);
     });
     const { port } = server.address() as net.AddressInfo;

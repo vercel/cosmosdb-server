@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this, no-underscore-dangle, no-use-before-define */
-import { randomUUID } from "crypto";
 import query, { CompositeIndex } from "@zeit/cosmosdb-query";
 import LRU from "lru-cache";
+import uuid from "uuid/v4";
 import ItemObject from "./item-object";
 import Item from "./item";
 import getValue from "../utils/get-value";
@@ -61,7 +61,7 @@ export default class Items<P extends Item, I extends Item> {
     const _data = {
       ...data,
       id: data.id,
-      _etag: randomUUID(),
+      _etag: uuid(),
       _rid,
       _self: this._self(_rid),
       _ts: ts()
@@ -192,7 +192,7 @@ export default class Items<P extends Item, I extends Item> {
     const _data = {
       ...data,
       id: data.id,
-      _etag: randomUUID(),
+      _etag: uuid(),
       _rid,
       _self,
       _ts: ts()

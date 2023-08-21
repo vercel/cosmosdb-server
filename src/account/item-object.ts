@@ -1,7 +1,4 @@
-export interface CompositeIndex {
-  path: string;
-  order?: "ascending" | "descending";
-}
+/* eslint-disable no-underscore-dangle */
 
 interface ItemObject {
   id: string;
@@ -22,4 +19,10 @@ interface ItemObject {
   [key: string]: any;
 }
 
+export interface CompositeIndex {
+  path: string;
+  order?: "ascending" | "descending";
+}
+
+// eslint-disable-next-line no-undef
 export default ItemObject;

@@ -1,26 +1,20 @@
-name: Build & Test
-on:
-  pull_request:
-
+on: push
+name: Build, Test, and Publish
 jobs:
-  quality:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [14, 16]
+        node: ['10.x', '12.x']
     steps:
-      - uses: actions/checkout@v3
-      - name: Additional Checkout
-        run: git submodule update --init --recursive
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node }}
-          cache: "yarn"
-      - name: Install Dependencies
-        run: yarn install --frozen-lockfile
-      - name: Lint
-        run: yarn lint
-      - name: Build
-        run: yarn build
-      - name: Test
-        run: yarn test
+    - uses: actions/checkout@master
+    - run: git submodule update --init --recursive
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node }}
+    - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}" > ~/.npmrc
+    - run: yarn
+    - run: yarn lint
+    - run: yarn test
+    - if: matrix.node == '12.x' && startsWith(github.ref, 'refs/tags/')
+      run: npm publish --access public --unsafe-perm
