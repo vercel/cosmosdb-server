@@ -21,11 +21,7 @@ export default (rules: { [x: string]: { [y: string]: Function } }) => {
     }
 
     let { method } = req;
-    
-    if (req.method === "POST" &&
-        trueHeader(req, "x-ms-cosmos-is-query-plan-request")){
-      method += "_QUERYPLAN";
-    } else if (
+    if (
       req.method === "POST" &&
       (trueHeader(req, "x-ms-documentdb-isquery") ||
         req.headers["content-type"] === "application/query+json")
