@@ -1,8 +1,10 @@
 export type PartitionValue = any;
 
+// eslint-disable-next-line no-use-before-define
 export interface JSONArray extends ArrayLike<JSONValue> {}
 
 export interface JSONObject {
+  // eslint-disable-next-line no-use-before-define
   [key: string]: JSONValue;
 }
 

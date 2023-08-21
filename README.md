@@ -3,7 +3,7 @@
 A Cosmos DB server implementation for testing your apps locally.
 
 ```js
-const { default: cosmosServer } = require("@zeit/cosmosdb-server");
+const { default: cosmosServer } = require("@vercel/cosmosdb-server");
 const { CosmosClient } = require("@azure/cosmos");
 const https = require("https");
 
@@ -34,7 +34,7 @@ async function runClient() {
 To choose between listening for HTTP and HTTPS, import the right function.
 
 ```js
-const { createHttpServer, createHttpsServer } = require("@zeit/cosmosdb-server"); 
+const { createHttpServer, createHttpsServer } = require("@vercel/cosmosdb-server"); 
 ```
 
 To run the server on cli:
@@ -52,7 +52,7 @@ cosmosdb-server -p 3000 --no-ssl
 ## installation
 
 ```sh
-npm install @zeit/cosmosdb-server
+npm install @vercel/cosmosdb-server
 ```
 
 It exposes the `cosmosdb-server` cli command as well.
