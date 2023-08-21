@@ -4,8 +4,6 @@ import Item from "./item";
 
 export default class Account extends Item {
   databases: Databases;
-  
-  ssl: boolean;
 
   constructor(host: string, port: number) {
     super({
