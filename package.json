@@ -1,6 +1,6 @@
 {
   "name": "@vercel/cosmosdb-server",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "A Cosmos DB server implementation",
   "license": "MIT",
   "main": "lib/index.js",
