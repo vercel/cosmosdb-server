@@ -379,6 +379,134 @@ const bulkApiDoNotContinueOnError = withTestEnv(async client => {
   assert.equal(response[4].statusCode, 424);
 });
 
+const patchDocumentSet = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-1",
+    name: "Test Document",
+    value: 100,
+    nested: {
+      property: "original"
+    }
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-1");
+
+  const patchOperations = [
+    { op: "set", path: "/value", value: 200 },
+    { op: "set", path: "/nested/property", value: "updated" },
+    { op: "set", path: "/newProperty", value: "created" }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.value, 200);
+  assert.strictEqual(result.nested.property, "updated");
+  assert.strictEqual(result.newProperty, "created");
+  assert.strictEqual(result.name, "Test Document");
+});
+
+const patchDocumentReplace = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-2",
+    name: "Test Document",
+    value: 100,
+    status: "active"
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-2");
+
+  const patchOperations = [
+    { op: "replace", path: "/value", value: 300 },
+    { op: "replace", path: "/status", value: "inactive" }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.value, 300);
+  assert.strictEqual(result.status, "inactive");
+  assert.strictEqual(result.name, "Test Document");
+});
+
+const patchDocumentRemove = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-3",
+    name: "Test Document",
+    removeThis: "should be removed",
+    keepThis: "should stay",
+    array: [1, 2, 3]
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-3");
+
+  const patchOperations = [
+    { op: "remove", path: "/removeThis" },
+    { op: "remove", path: "/array/1" }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.removeThis, undefined);
+  assert.strictEqual(result.keepThis, "should stay");
+  assert.deepStrictEqual(result.array, [1, 3]);
+});
+
+const patchDocumentWithCondition = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-4",
+    name: "Test Document",
+    status: "active",
+    priority: "high",
+    value: 100
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-4");
+
+  // Patch with condition - should succeed because status is "active"
+  const patchOperations = [
+    { op: "set", path: "/value", value: 500 },
+    { op: "set", path: "/priority", value: "critical" }
+  ];
+
+  const patchOptions = {
+    condition: "FROM c WHERE c.status = 'active'"
+  };
+
+  await item.patch(patchOperations, patchOptions);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.value, 500);
+  assert.strictEqual(result.priority, "critical");
+  assert.strictEqual(result.status, "active");
+  assert.strictEqual(result.name, "Test Document");
+});
+
 describe("CosmosDB", () => {
   it("read document 404", readDocument404);
   it("upsert document", upsertDocument);
@@ -404,4 +532,11 @@ describe("CosmosDB", () => {
   );
   it("bulkApi", bulkApi);
   it("bulkApiDoNotContinueOnError", bulkApiDoNotContinueOnError);
+  it("should patch a document with set operation", patchDocumentSet);
+  it("should patch a document with replace operation", patchDocumentReplace);
+  it("should patch a document with remove operation", patchDocumentRemove);
+  it(
+    "should patch a document with condition that succeeds",
+    patchDocumentWithCondition
+  );
 });
