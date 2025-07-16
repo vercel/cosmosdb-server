@@ -7,6 +7,9 @@ export interface PatchOperationResult {
   body?: JSONObject;
 }
 
+// When doing Patch updates, we specify the JSON path to the property we want to update.
+// This function is used to get the value at the specified path.
+// It also supports creating the path if it doesn't exist (for set operations).
 function getValueAtPath(
   obj: any,
   pathSegments: string[],
