@@ -37,7 +37,7 @@
     "@azure/cosmos": "3.17.3",
     "@types/jest": "^29.5.1",
     "@types/lru-cache": "5.1.0",
-    "@types/node": "^16.0.0",
+    "@types/node": "20",
     "@typescript-eslint/eslint-plugin": "5.59.6",
     "@typescript-eslint/parser": "5.59.6",
     "@zeit/git-hooks": "0.1.4",
@@ -103,6 +103,7 @@
     ]
   },
   "engines": {
-    "node": ">=14.17"
-  }
+    "node": ">=20"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
