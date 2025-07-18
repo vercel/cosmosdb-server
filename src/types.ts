@@ -62,9 +62,10 @@ export interface ReplaceOperationInput {
 }
 
 export interface PatchOperation {
-  op: "remove" | "replace" | "set";
+  op: "remove" | "replace" | "set" | "add" | "incr" | "move";
   path: string;
   value?: any;
+  from?: string; // Required for move operations
 }
 
 export interface PatchOperationInput {

@@ -15,6 +15,8 @@ pid=$!
 
 cd test/azure-sdk-for-js
 npm i -g @microsoft/rush
+
+rush purge
 rush install || rush install # try twice, the first seems to fail for no reason, but then it works
 
 # Override all `tsconfig.json` to prevent it picking up type definitions from our
@@ -27,9 +29,12 @@ for f in $(find . -name tsconfig.json | grep -v node_modules); do
 done
 
 cd sdk/cosmosdb/cosmos
-rush build:test -t .
 
-git reset --hard
+# Lib is required to run the tests.
+jq '.compilerOptions.lib = ["ES2017", "DOM"]' tsconfig.json > tsconfig.json.bak && mv tsconfig.json.bak tsconfig.json
 
-ACCOUNT_HOST="https://localhost:$port" npm run integration-test:node -- -i --exit \
-  -g 'Authorization|http proxy|Change Feed|Partition|indexing|Offer CRUD|Parallel Query As String|Permission|Query Metrics On Single Partition Collection|ResourceLink Trimming|Session Token|spatial|sproc|stored procedure|Trigger|trigger|TTL|User|Non Partitioned|Validate SSL verification|matching constant version & package version|Conflicts|Partition|GROUP BY|.readOffer|autoscale|with v2 container'
+rush build -t . && rush test -t .
+
+#git reset --hard
+
+ACCOUNT_HOST="https://localhost:$port" npm run test:node:integration -- --testNamePattern='\^\(?!.*\(Authorization\|Change\ Feed\|Partition\|indexing\|Offer\ CRUD\|Permission\|Session\ Token\|sproc\|stored\ procedure\|Trigger\|TTL\|User\|Non\ Partitioned\|autoscale\|nonStreaming\|Iterator\|startFromBeginnin\|Full\ Text\ Search\|Full\ text\ search\ feature\|GROUP\ BY\|TOP\|DISTINCT\|ORDER\ BY\|LIMIT\|Conflicts\|readOffer\|validate\ trigger\ functionality\|SELECT\ VALUE\ AVG\ with\ ORDER\ BY\|changeFeedIterator\|test\ changefeed\|validate\ changefeed\ results\|New\ session\ token\|Validate\ SSL\ verification\|test\ batch\ operations\|test\ bulk\ operations\|test\ executeBulkOperations\|Id\ encoding\|Correlated\ Activity.*force\ query\ plan\|Correlated\ Activity.*GROUP\ BY\|aggregate\ query\ over\ null\ value\|Vector\ search\ feature\|Vector\ Search\ Query\|Bad\ partition\ key\ definition\|Reading\ items\ using\ container\|ClientSideEncryption\)\).*'

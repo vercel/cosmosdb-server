@@ -159,11 +159,148 @@ function setPatchOperation(
   return result;
 }
 
+function addPatchOperation(
+  document: JSONObject,
+  pathSegments: string[],
+  value: any
+): JSONObject {
+  if (pathSegments.length === 0) {
+    throw new Error("Cannot add root document.");
+  }
+
+  const result = JSON.parse(JSON.stringify(document));
+  const parentPath = pathSegments.slice(0, -1);
+  const key = pathSegments[pathSegments.length - 1];
+
+  const parent = getValueAtPath(result, parentPath, true);
+
+  if (Array.isArray(parent)) {
+    if (key === "-") {
+      // Special case: append to end of array
+      parent.push(value);
+    } else {
+      const index = parseInt(key, 10);
+      if (Number.isNaN(index) || index < 0) {
+        throw new Error("Invalid array index.");
+      }
+      if (index > parent.length) {
+        throw new Error("Index to operate on is out of array bounds.");
+      }
+      // Insert at index (or append if index === length)
+      parent.splice(index, 0, value);
+    }
+  } else if (typeof parent === "object" && parent !== null) {
+    // For objects, add/replace the property
+    parent[key] = value;
+  } else {
+    throw new Error(
+      "Add Operation can only create a child object of an existing node (array or object)."
+    );
+  }
+
+  return result;
+}
+
+function incrPatchOperation(
+  document: JSONObject,
+  pathSegments: string[],
+  value: any
+): JSONObject {
+  if (pathSegments.length === 0) {
+    throw new Error("Cannot increment root document.");
+  }
+
+  if (typeof value !== "number") {
+    throw new Error("Increment value must be a number.");
+  }
+
+  const result = JSON.parse(JSON.stringify(document));
+  const parentPath = pathSegments.slice(0, -1);
+  const key = pathSegments[pathSegments.length - 1];
+
+  const parent = getValueAtPath(result, parentPath, true);
+
+  if (Array.isArray(parent)) {
+    const index = parseInt(key, 10);
+    if (Number.isNaN(index) || index < 0 || index >= parent.length) {
+      throw new Error("Index to operate on is out of array bounds.");
+    }
+    const currentValue = parent[index];
+    if (typeof currentValue === "number") {
+      parent[index] = currentValue + value;
+    } else if (currentValue === undefined || currentValue === null) {
+      parent[index] = value;
+    } else {
+      throw new Error("Cannot increment non-numeric value.");
+    }
+  } else if (typeof parent === "object" && parent !== null) {
+    const currentValue = parent[key];
+    if (typeof currentValue === "number") {
+      parent[key] = currentValue + value;
+    } else if (currentValue === undefined || currentValue === null) {
+      parent[key] = value;
+    } else {
+      throw new Error("Cannot increment non-numeric value.");
+    }
+  } else {
+    throw new Error(
+      "Increment Operation can only operate on numeric properties of existing nodes (array or object)."
+    );
+  }
+
+  return result;
+}
+
+function movePatchOperation(
+  document: JSONObject,
+  pathSegments: string[],
+  from?: string
+): JSONObject {
+  if (!from || typeof from !== "string" || !from.startsWith("/")) {
+    throw new Error("Move operation requires a valid 'from' path.");
+  }
+
+  if (from === `/${pathSegments.join("/")}`) {
+    throw new Error("Cannot move a value to itself.");
+  }
+
+  // Don't allow moving from system properties
+  if (from.startsWith("/_")) {
+    const systemProperty = from.split("/")[1];
+    throw new Error(`Can't move from system property ${systemProperty}.`);
+  }
+
+  // Check if 'path' is a child of 'from'
+  const fromPath = `/${pathSegments.join("/")}`;
+  if (fromPath.startsWith(`${from}/`)) {
+    throw new Error("Cannot move a value to a child of itself.");
+  }
+
+  const fromSegments = from
+    .slice(1)
+    .split("/")
+    .map(segment => segment.replace(/~1/g, "/").replace(/~0/g, "~"));
+
+  // First, get the value from the source location
+  const result = JSON.parse(JSON.stringify(document));
+  const sourceValue = getValueAtPath(result, fromSegments);
+
+  if (sourceValue === undefined) {
+    throw new Error("Source location for move operation does not exist.");
+  }
+
+  // Remove the value from the source location
+  const removedResult = removePatchOperation(result, fromSegments);
+
+  // Add the value to the target location
+  return addPatchOperation(removedResult, pathSegments, sourceValue);
+}
+
 function applySinglePatchOperation(
   document: JSONObject,
   operation: PatchOperation
 ): JSONObject {
-  const { op, path, value } = operation;
+  const { op, path, value, from } = operation;
 
   if (!path || typeof path !== "string" || !path.startsWith("/")) {
     throw new Error("Invalid path in patch operation.");
@@ -191,6 +328,12 @@ function applySinglePatchOperation(
       return replacePatchOperation(document, pathSegments, value);
     case "set":
       return setPatchOperation(document, pathSegments, value);
+    case "add":
+      return addPatchOperation(document, pathSegments, value);
+    case "incr":
+      return incrPatchOperation(document, pathSegments, value);
+    case "move":
+      return movePatchOperation(document, pathSegments, from);
     default:
       throw new Error(`Unsupported patch operation: ${op}`);
   }
@@ -244,9 +387,42 @@ export function patchOperation(
   // Check conditional patch
   if (input.condition) {
     try {
-      const query = collection.documents.query({ query: input.condition }, {});
-      const results = query.result.filter((doc: any) => doc.id === input.id);
-      if (results.length === 0) {
+      // Build a complete query to check the condition against the specific document
+      let conditionQuery: string;
+
+      // Handle both formats: full query vs condition clause
+      if (input.condition.toLowerCase().includes("select")) {
+        // Already a complete query
+        conditionQuery = input.condition;
+      } else {
+        // Just a condition clause, build a complete query
+        const conditionClause = input.condition.toLowerCase().trim();
+
+        if (conditionClause.startsWith("from c where")) {
+          // Azure SDK format: "from c where NOT IS_DEFINED(c.newImproved)"
+          const whereClause = conditionClause
+            .substring("from c where".length)
+            .trim();
+          conditionQuery = `SELECT * FROM c WHERE c.id = @id AND (${whereClause})`;
+        } else if (conditionClause.startsWith("where")) {
+          // Alternative format: "where c.status = 'active'"
+          const whereClause = conditionClause.substring("where".length).trim();
+          conditionQuery = `SELECT * FROM c WHERE c.id = @id AND (${whereClause})`;
+        } else {
+          // Legacy format: "FROM c WHERE c.status = 'active'"
+          conditionQuery = `SELECT * ${input.condition} AND c.id = @id`;
+        }
+      }
+
+      const query = collection.documents.query(
+        {
+          query: conditionQuery,
+          parameters: [{ name: "@id", value: input.id }]
+        },
+        {}
+      );
+
+      if (query.result.length === 0) {
         return {
           statusCode: 412,
           body: {
