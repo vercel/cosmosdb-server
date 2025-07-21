@@ -30,8 +30,9 @@ done
 
 cd sdk/cosmosdb/cosmos
 
-# Lib is required to run the tests.
-jq '.compilerOptions.lib = ["ES2017", "DOM"]' tsconfig.json > tsconfig.json.bak && mv tsconfig.json.bak tsconfig.json
+# Fix TypeScript compilation errors by adding "dom" to lib array for console support
+jq '.compilerOptions.lib = (.compilerOptions.lib // ["es2019"]) + ["dom"] | .compilerOptions.lib |= unique' tsconfig.json > tsconfig.json.tmp && mv tsconfig.json.tmp tsconfig.json
+jq '.compilerOptions.lib = (.compilerOptions.lib // ["es2019"]) + ["dom"] | .compilerOptions.lib |= unique' test/tsconfig.json > test/tsconfig.json.tmp && mv test/tsconfig.json.tmp test/tsconfig.json
 
 rush build -t . && rush test -t .
 
