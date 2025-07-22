@@ -1,6 +1,6 @@
 {
   "name": "@vercel/cosmosdb-server",
-  "version": "0.16.0",
+  "version": "1.0.0",
   "description": "A Cosmos DB server implementation",
   "license": "MIT",
   "main": "lib/index.js",
@@ -37,7 +37,7 @@
     "@azure/cosmos": "3.17.3",
     "@types/jest": "^29.5.1",
     "@types/lru-cache": "5.1.0",
-    "@types/node": "20",
+    "@types/node": "^20.19.9",
     "@typescript-eslint/eslint-plugin": "5.59.6",
     "@typescript-eslint/parser": "5.59.6",
     "@zeit/git-hooks": "0.1.4",
