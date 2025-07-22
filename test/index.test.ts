@@ -488,7 +488,6 @@ const patchDocumentWithCondition = withTestEnv(async client => {
   await container.items.create(testDoc);
   const item = container.item("patch-test-4");
 
-  // Patch with condition - should succeed because status is "active"
   const patchOperations = [
     { op: "set", path: "/value", value: 500 },
     { op: "set", path: "/priority", value: "critical" }
@@ -525,10 +524,10 @@ const patchDocumentAdd = withTestEnv(async client => {
 
   const patchOperations = [
     { op: "add", path: "/newProperty", value: "added" },
-    { op: "add", path: "/object/existing", value: "replaced" }, // replace existing
-    { op: "add", path: "/object/newProp", value: "new" }, // add new property
-    { op: "add", path: "/array/1", value: "inserted" }, // insert into array
-    { op: "add", path: "/array/-", value: "appended" } // append to array
+    { op: "add", path: "/object/existing", value: "replaced" },
+    { op: "add", path: "/object/newProp", value: "new" },
+    { op: "add", path: "/array/1", value: "inserted" },
+    { op: "add", path: "/array/-", value: "appended" }
   ];
 
   await item.patch(patchOperations);
@@ -558,10 +557,10 @@ const patchDocumentIncrement = withTestEnv(async client => {
   const item = container.item("patch-test-6");
 
   const patchOperations = [
-    { op: "incr", path: "/counter", value: 5 }, // increment existing
-    { op: "incr", path: "/newCounter", value: 25 }, // create new field
-    { op: "incr", path: "/scores/1", value: -50 }, // decrement array element
-    { op: "incr", path: "/negative", value: -10 } // create with negative value
+    { op: "incr", path: "/counter", value: 5 },
+    { op: "incr", path: "/newCounter", value: 25 },
+    { op: "incr", path: "/scores/1", value: -50 },
+    { op: "incr", path: "/negative", value: -10 }
   ];
 
   await item.patch(patchOperations);
@@ -594,9 +593,9 @@ const patchDocumentMove = withTestEnv(async client => {
   const item = container.item("patch-test-7");
 
   const patchOperations = [
-    { op: "move", from: "/source", path: "/destination" }, // move property
-    { op: "move", from: "/nested/prop", path: "/movedNested" }, // move from nested
-    { op: "move", from: "/array/0", path: "/firstItem" } // move from array
+    { op: "move", from: "/source", path: "/destination" },
+    { op: "move", from: "/nested/prop", path: "/movedNested" },
+    { op: "move", from: "/array/0", path: "/firstItem" }
   ];
 
   await item.patch(patchOperations);
