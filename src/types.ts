@@ -22,7 +22,8 @@ export const BulkOperationType = {
   Upsert: "Upsert",
   Read: "Read",
   Delete: "Delete",
-  Replace: "Replace"
+  Replace: "Replace",
+  Patch: "Patch"
 };
 
 export interface CreateOperationInput {
@@ -58,4 +59,21 @@ export interface ReplaceOperationInput {
   ifNoneMatch?: string;
   operationType?: typeof BulkOperationType.Replace;
   resourceBody: JSONObject;
+}
+
+export interface PatchOperation {
+  op: "remove" | "replace" | "set" | "add" | "incr" | "move";
+  path: string;
+  value?: any;
+  from?: string; // Required for move operations
+}
+
+export interface PatchOperationInput {
+  partitionKey?: string;
+  ifMatch?: string;
+  ifNoneMatch?: string;
+  operationType?: typeof BulkOperationType.Patch;
+  id: string;
+  operations: PatchOperation[];
+  condition?: string;
 }

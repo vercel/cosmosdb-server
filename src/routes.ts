@@ -7,6 +7,7 @@ import deleteCollection from "./handler/delete-collection";
 import deleteDocument from "./handler/delete-document";
 import deleteDatabase from "./handler/delete-database";
 import deleteUserDefinedFunction from "./handler/delete-user-defined-function";
+import patchDocument from "./handler/patch-document";
 import queryCollections from "./handler/query-collections";
 import queryDatabases from "./handler/query-databases";
 import queryDocuments from "./handler/query-documents";
@@ -46,6 +47,9 @@ export default router({
     "/dbs/:dbId": readDatabase,
     "/dbs": readDatabases,
     "/": readMeta
+  },
+  PATCH: {
+    "/dbs/:dbId/colls/:collId/docs/:docId": patchDocument
   },
   POST: {
     "/dbs/:dbId/colls/:collId/docs": createDocument,

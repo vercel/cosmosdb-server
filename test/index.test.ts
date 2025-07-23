@@ -379,6 +379,237 @@ const bulkApiDoNotContinueOnError = withTestEnv(async client => {
   assert.equal(response[4].statusCode, 424);
 });
 
+const patchDocumentSet = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-1",
+    name: "Test Document",
+    value: 100,
+    nested: {
+      property: "original"
+    }
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-1");
+
+  const patchOperations = [
+    { op: "set", path: "/value", value: 200 },
+    { op: "set", path: "/nested/property", value: "updated" },
+    { op: "set", path: "/newProperty", value: "created" }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.value, 200);
+  assert.strictEqual(result.nested.property, "updated");
+  assert.strictEqual(result.newProperty, "created");
+  assert.strictEqual(result.name, "Test Document");
+});
+
+const patchDocumentReplace = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-2",
+    name: "Test Document",
+    value: 100,
+    status: "active"
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-2");
+
+  const patchOperations = [
+    { op: "replace", path: "/value", value: 300 },
+    { op: "replace", path: "/status", value: "inactive" }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.value, 300);
+  assert.strictEqual(result.status, "inactive");
+  assert.strictEqual(result.name, "Test Document");
+});
+
+const patchDocumentRemove = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-3",
+    name: "Test Document",
+    removeThis: "should be removed",
+    keepThis: "should stay",
+    array: [1, 2, 3]
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-3");
+
+  const patchOperations = [
+    { op: "remove", path: "/removeThis" },
+    { op: "remove", path: "/array/1" }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.removeThis, undefined);
+  assert.strictEqual(result.keepThis, "should stay");
+  assert.deepStrictEqual(result.array, [1, 3]);
+});
+
+const patchDocumentWithCondition = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-4",
+    name: "Test Document",
+    status: "active",
+    priority: "high",
+    value: 100
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-4");
+
+  const patchOperations = [
+    { op: "set", path: "/value", value: 500 },
+    { op: "set", path: "/priority", value: "critical" }
+  ];
+
+  const patchOptions = {
+    condition: "FROM c WHERE c.status = 'active'"
+  };
+
+  await item.patch(patchOperations, patchOptions);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.value, 500);
+  assert.strictEqual(result.priority, "critical");
+  assert.strictEqual(result.status, "active");
+  assert.strictEqual(result.name, "Test Document");
+});
+
+const patchDocumentAdd = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-5",
+    name: "Test Document",
+    array: [1, 2, 3],
+    object: { existing: "value" }
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-5");
+
+  const patchOperations = [
+    { op: "add", path: "/newProperty", value: "added" },
+    { op: "add", path: "/object/existing", value: "replaced" },
+    { op: "add", path: "/object/newProp", value: "new" },
+    { op: "add", path: "/array/1", value: "inserted" },
+    { op: "add", path: "/array/-", value: "appended" }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.newProperty, "added");
+  assert.strictEqual(result.object.existing, "replaced");
+  assert.strictEqual(result.object.newProp, "new");
+  assert.deepStrictEqual(result.array, [1, "inserted", 2, 3, "appended"]);
+  assert.strictEqual(result.name, "Test Document");
+});
+
+const patchDocumentIncrement = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-6",
+    name: "Test Document",
+    counter: 10,
+    scores: [100, 200, 300]
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-6");
+
+  const patchOperations = [
+    { op: "incr", path: "/counter", value: 5 },
+    { op: "incr", path: "/newCounter", value: 25 },
+    { op: "incr", path: "/scores/1", value: -50 },
+    { op: "incr", path: "/negative", value: -10 }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.counter, 15);
+  assert.strictEqual(result.newCounter, 25);
+  assert.strictEqual(result.negative, -10);
+  assert.deepStrictEqual(result.scores, [100, 150, 300]);
+  assert.strictEqual(result.name, "Test Document");
+});
+
+const patchDocumentMove = withTestEnv(async client => {
+  const { database } = await client.databases.create({ id: "patch-test-db" });
+  const { container } = await database.containers.create({
+    id: "patch-test-container"
+  });
+
+  const testDoc = {
+    id: "patch-test-7",
+    name: "Test Document",
+    source: "value to move",
+    nested: {
+      prop: "nested value"
+    },
+    array: ["item1", "item2", "item3"]
+  };
+
+  await container.items.create(testDoc);
+  const item = container.item("patch-test-7");
+
+  const patchOperations = [
+    { op: "move", from: "/source", path: "/destination" },
+    { op: "move", from: "/nested/prop", path: "/movedNested" },
+    { op: "move", from: "/array/0", path: "/firstItem" }
+  ];
+
+  await item.patch(patchOperations);
+  const { resource: result } = await item.read();
+
+  assert.strictEqual(result.destination, "value to move");
+  assert.strictEqual(result.movedNested, "nested value");
+  assert.strictEqual(result.firstItem, "item1");
+  assert.strictEqual(result.source, undefined);
+  assert.deepStrictEqual(result.nested, {});
+  assert.deepStrictEqual(result.array, ["item2", "item3"]);
+  assert.strictEqual(result.name, "Test Document");
+});
+
 describe("CosmosDB", () => {
   it("read document 404", readDocument404);
   it("upsert document", upsertDocument);
@@ -404,4 +635,17 @@ describe("CosmosDB", () => {
   );
   it("bulkApi", bulkApi);
   it("bulkApiDoNotContinueOnError", bulkApiDoNotContinueOnError);
+  it("should patch a document with set operation", patchDocumentSet);
+  it("should patch a document with replace operation", patchDocumentReplace);
+  it("should patch a document with remove operation", patchDocumentRemove);
+  it(
+    "should patch a document with condition that succeeds",
+    patchDocumentWithCondition
+  );
+  it("should patch a document with add operation", patchDocumentAdd);
+  it(
+    "should patch a document with increment operation",
+    patchDocumentIncrement
+  );
+  it("should patch a document with move operation", patchDocumentMove);
 });

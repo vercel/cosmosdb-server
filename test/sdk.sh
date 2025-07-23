@@ -8,28 +8,32 @@
 # tool they use to manage their monorepo.
 set -euo pipefail
 
+# Required so that we do not have a "phantom" node_modules directory when running
+# rush. Setting "typeRoots": ["./node_modules/@types/"] in all tsconfig.json files
+# does not work.
+mv node_modules node_modules.bak
+
+cd test/azure-sdk-for-js
+npm i -g @microsoft/rush
+
+rush purge
+rush install
+
+cd sdk/cosmosdb/cosmos
+rush build -t . && rush test -t .
+
+# Cosmos SDK has been built and tested. We can use again the root node_modules directory.
+cd ../../../../../
+mv node_modules.bak node_modules
+
+# Start a local CosmosDB server.
 readonly port="$((RANDOM + 3000))"
 trap 'kill -9 $pid' EXIT
 ts-node ./src/cli.ts -p "$port" &
 pid=$!
 
-cd test/azure-sdk-for-js
-npm i -g @microsoft/rush
-rush install || rush install # try twice, the first seems to fail for no reason, but then it works
-
-# Override all `tsconfig.json` to prevent it picking up type definitions from our
-# node_modules (which is a parent dir).
-# Manually filtering a couple of dodgy ones out, because they contain json comments, which jq can't parse
-for f in $(find . -name tsconfig.json | grep -v node_modules); do
-  cp "$f" "$f.bak"
-  cat "$f.bak" | jq '. * { "compilerOptions": { "typeRoots": ["./node_modules/@types/"] }}' > "$f" || echo "skipping $f"
-  rm "$f.bak"
-done
-
-cd sdk/cosmosdb/cosmos
-rush build:test -t .
-
-git reset --hard
-
-ACCOUNT_HOST="https://localhost:$port" npm run integration-test:node -- -i --exit \
-  -g 'Authorization|http proxy|Change Feed|Partition|indexing|Offer CRUD|Parallel Query As String|Permission|Query Metrics On Single Partition Collection|ResourceLink Trimming|Session Token|spatial|sproc|stored procedure|Trigger|trigger|TTL|User|Non Partitioned|Validate SSL verification|matching constant version & package version|Conflicts|Partition|GROUP BY|.readOffer|autoscale|with v2 container'
+# Run the tests against the local CosmosDB server.
+# The executed tests are for Cosmos SDK 4.5.0, but we only have partial support for 3.17.x.
+# That is why there are so many ignored test patterns.
+cd test/azure-sdk-for-js/sdk/cosmosdb/cosmos
+ACCOUNT_HOST="https://localhost:$port" npm run test:node:integration -- --testNamePattern='\^\(?!.*\(Authorization\|Change\ Feed\|Partition\|indexing\|Offer\ CRUD\|Permission\|Session\ Token\|sproc\|stored\ procedure\|Trigger\|TTL\|User\|Non\ Partitioned\|autoscale\|nonStreaming\|Iterator\|startFromBeginnin\|Full\ Text\ Search\|Full\ text\ search\ feature\|GROUP\ BY\|TOP\|DISTINCT\|ORDER\ BY\|LIMIT\|Conflicts\|readOffer\|validate\ trigger\ functionality\|SELECT\ VALUE\ AVG\ with\ ORDER\ BY\|changeFeedIterator\|test\ changefeed\|validate\ changefeed\ results\|New\ session\ token\|Validate\ SSL\ verification\|test\ batch\ operations\|test\ bulk\ operations\|test\ executeBulkOperations\|Id\ encoding\|Correlated\ Activity.*force\ query\ plan\|Correlated\ Activity.*GROUP\ BY\|aggregate\ query\ over\ null\ value\|Vector\ search\ feature\|Vector\ Search\ Query\|Bad\ partition\ key\ definition\|Reading\ items\ using\ container\|ClientSideEncryption\)\).*'
