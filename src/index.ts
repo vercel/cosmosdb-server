@@ -76,7 +76,7 @@ const generateRequestHandler = ({
   });
 };
 
-const createAccount = (address: string | net.AddressInfo) => {
+const createAccount = (address: string | net.AddressInfo, ssl: boolean) => {
   if (!address || typeof address !== "object") {
     throw new Error(`Unexpected address type: ${address}`);
   }
@@ -84,7 +84,7 @@ const createAccount = (address: string | net.AddressInfo) => {
   const { address: host, port } = address as net.AddressInfo;
   const hostname = host === "0.0.0.0" || host === "::" ? "localhost" : host;
 
-  return new Account(hostname, port);
+  return new Account(hostname, port, ssl);
 };
 
 export function createHttpServer(opts: http.ServerOptions = {}) {
@@ -98,7 +98,7 @@ export function createHttpServer(opts: http.ServerOptions = {}) {
       handleRequest(account, req, res);
     })
     .on("listening", () => {
-      account = createAccount(server.address());
+      account = createAccount(server.address(), false);
     });
 
   return server;
@@ -124,7 +124,7 @@ export function createHttpsServer(opts?: https.ServerOptions) {
       handleRequest(account, req, res);
     })
     .on("listening", () => {
-      account = createAccount(server.address());
+      account = createAccount(server.address(), true);
     });
 
   return server;
