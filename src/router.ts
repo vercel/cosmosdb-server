@@ -19,6 +19,10 @@ export default (rules: { [x: string]: { [y: string]: Function } }) => {
     if (pathname && pathname.slice(0, 2) === "//") {
       pathname = pathname.slice(1);
     }
+    // strip trailing slashes
+    while (pathname && pathname.length > 1 && pathname.endsWith("/")) {
+      pathname = pathname.slice(0, -1);
+    }
 
     let { method } = req;
     if (
