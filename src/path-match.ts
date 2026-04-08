@@ -1,8 +1,7 @@
-import pathToRegexp from "path-to-regexp";
+import { pathToRegexp } from "path-to-regexp";
 
 export default (path: string, opts?: {}) => {
-  const keys: any[] = [];
-  const regexp = pathToRegexp(path, keys, opts);
+  const { regexp, keys } = pathToRegexp(path, opts);
 
   return (pathname: string) => {
     const m = regexp.exec(pathname);
